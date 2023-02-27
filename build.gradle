@@ -12,6 +12,7 @@ ext {
     materialVersion = '1.8.0'
     roomVersion = '2.5.0'
     fragmentVersion = '1.5.5'
+    gsonVersion = '2.10.1'
     // testing
     junitVersion = '4.13.2'
     mockitoVersion = '5.1.1'

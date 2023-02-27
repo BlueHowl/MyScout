@@ -7,7 +7,7 @@ import java.util.*
 
 @Dao
 interface PhaseDao {
-    @Query("SELECT * FROM " +
+    @Query("SELECT P.id, P.name, P.description, P.duration, P.notice, P.favorite FROM " +
             "Phase AS P " +
             "JOIN MeetingPhaseJoin AS MPJ ON P.id = MPJ.phaseId " +
             "JOIN Meeting AS M ON M.id = MPJ.meetingId " +

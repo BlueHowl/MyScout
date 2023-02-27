@@ -10,6 +10,8 @@ data class Phase (
     @PrimaryKey
     val id: UUID,
 
+    var name: String?,
+
     var description: String?,
 
     @NonNull
