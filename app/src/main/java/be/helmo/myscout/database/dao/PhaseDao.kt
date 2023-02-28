@@ -14,6 +14,10 @@ interface PhaseDao {
             "WHERE M.id = (:uuid)")
     fun getPhases(uuid: UUID?): LiveData<List<Phase?>?>?
 
+    @Query("SELECT id, name, description, duration, notice, favorite FROM Phase " +
+            "WHERE id = (:uuid)")
+    fun getPhase(uuid: UUID?): LiveData<Phase?>?
+
     @Insert
     fun insert(phase: Phase?)
 

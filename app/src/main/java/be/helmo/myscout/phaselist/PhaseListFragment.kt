@@ -19,9 +19,9 @@ class PhaseListFragment : Fragment() {
 
     var phaseListViewModel: PhaseListViewModel? = null
     var recyclerView: RecyclerView? = null
-    var callback: ISelectPlace? = null
+    var callback: ISelectPhase? = null
 
-    interface ISelectPlace {
+    interface ISelectPhase {
         fun onSelectedPhase(placeId: UUID?)
     }
 
@@ -85,7 +85,7 @@ class PhaseListFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         Log.d(TAG, "onAttach called")
-        callback = context as ISelectPlace
+        callback = context as ISelectPhase
     }
 
     override fun onDetach() {
@@ -102,7 +102,7 @@ class PhaseListFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return if (item.itemId == R.id.new_phase) {
-            val phase = Phase(UUID.randomUUID(), "test", "description", 123456789, "notice", false) //test
+            val phase = Phase(UUID.randomUUID(), "", "", 0, "", false) //test
             phaseListViewModel!!.addPhase(phase)
             callback!!.onSelectedPhase(phase.id)
             true

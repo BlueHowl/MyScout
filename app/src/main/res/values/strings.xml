@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">MyScout</string>
+    <string name="add_phase">Ajouter une phase</string>
+    <string name="phase_name_title">Nom de la phase : </string>
+    <string name="phase_name_edit_text">Entrer le nom de la phase ici</string>
 </resources>

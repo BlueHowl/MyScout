@@ -4,14 +4,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.DataBindingUtil.setContentView
 import androidx.recyclerview.widget.RecyclerView
 import be.helmo.myscout.R
 import be.helmo.myscout.databinding.PhaseListItemBinding
 import be.helmo.myscout.model.Phase
-import be.helmo.myscout.phaselist.PhaseListFragment.ISelectPlace
+import be.helmo.myscout.phaselist.PhaseListFragment.ISelectPhase
 
-class PhaseAdapter(val phases: List<Phase>, val callBacks: ISelectPlace) :
+class PhaseAdapter(val phases: List<Phase>, val callBacks: ISelectPhase) :
     RecyclerView.Adapter<PhaseAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -28,10 +27,10 @@ class PhaseAdapter(val phases: List<Phase>, val callBacks: ISelectPlace) :
         return phases.size
     }
 
-    inner class ViewHolder(viewDataBinding: PhaseListItemBinding, callBacks: ISelectPlace) :
+    inner class ViewHolder(viewDataBinding: PhaseListItemBinding, callBacks: ISelectPhase) :
         RecyclerView.ViewHolder(viewDataBinding.getRoot()), View.OnClickListener {
         private val viewDataBinding: PhaseListItemBinding
-        private val callBacks: ISelectPlace
+        private val callBacks: ISelectPhase
         var mItem: Phase? = null
 
         init {

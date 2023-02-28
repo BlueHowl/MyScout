@@ -34,6 +34,10 @@ class MyScoutRepository {//private constructor() {
         return phaseDao?.getPhases(meetingUUID)
     }
 
+    fun getPhase(phaseUUID: UUID?): LiveData<Phase?>? {
+        return phaseDao?.getPhase(phaseUUID)
+    }
+
     fun insertPhase(phase: Phase?) {
         executor.execute { phaseDao?.insert(phase) }
     }
