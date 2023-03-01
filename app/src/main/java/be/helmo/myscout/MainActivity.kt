@@ -2,9 +2,12 @@ package be.helmo.myscout
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import be.helmo.myscout.phaseeditor.PhaseFragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import be.helmo.myscout.phaselist.PhaseListFragment
+import be.helmo.myscout.phaseeditor.PhaseFragment
 import java.util.*
+
 
 class MainActivity : AppCompatActivity(), PhaseListFragment.ISelectPhase{
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,8 +22,11 @@ class MainActivity : AppCompatActivity(), PhaseListFragment.ISelectPhase{
     }
 
     override fun onSelectedPhase(phaseId: UUID?) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, PhaseFragment.newInstance(phaseId))
-            .addToBackStack(null).commit()
+        val fragment = PhaseFragment.newInstance()
+        val fragmentManager: FragmentManager = supportFragmentManager
+        val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.replace(R.id.fragment_container, fragment)
+        fragmentTransaction.addToBackStack(null)
+        fragmentTransaction.commit()
     }
 }

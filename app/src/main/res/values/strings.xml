@@ -2,5 +2,16 @@
     <string name="app_name">MyScout</string>
     <string name="add_phase">Ajouter une phase</string>
     <string name="phase_name_title">Nom de la phase : </string>
-    <string name="phase_name_edit_text">Entrer le nom de la phase ici</string>
+    <string name="phase_start_time_edit_title">Entrer l\'heure de début</string>
+    <string name="phase_start_time_title">Heure de début : </string>
+    <string name="phase_during_title">Durée : </string>
+    <string name="phase_during_edit_title">Entrer la durée en minutes </string>
+    <string name="phase_resume_title">Résumé : </string>
+    <string name="phase_resume_edit_title">Entrer le résumé</string>
+    <string name="phase_adding_photo_title">Ajouter une/des photos</string>
+    <string name="phase_abort">anuler</string>
+    <string name="phase_validate">valider</string>
+    <string name="phase_previous_photo">précédente</string>
+    <string name="phase_next_photo">suivante</string>
+    <string name="phase_pick_photos">ajouter</string>
 </resources>
