@@ -1,9 +1,10 @@
 package be.helmo.myscout.database.repository
 
-import androidx.lifecycle.LiveData
+import android.util.Log
 import be.helmo.myscout.database.MyScoutDatabase
 import be.helmo.myscout.model.Meeting
 import be.helmo.myscout.model.Phase
+import kotlinx.coroutines.flow.Flow
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -14,10 +15,11 @@ class MyScoutRepository {//private constructor() {
     val executor = Executors.newSingleThreadExecutor()
 
     //Meeting
-    val meetings: LiveData<List<Meeting?>?>?
+    val meetings: Flow<List<Meeting?>?>?
         get() = meetingDao?.meetings
 
     fun insertMeeting(meeting: Meeting?) {
+        Log.d("meetingDao", meetingDao?.meetings.toString()) //null wtf
         executor.execute { meetingDao?.insert(meeting) }
     }
 
@@ -30,11 +32,11 @@ class MyScoutRepository {//private constructor() {
     }
 
     //Phase
-    fun getPhases(meetingUUID: UUID?): LiveData<List<Phase?>?>? {
+    fun getPhases(meetingUUID: UUID?): Flow<List<Phase?>?>? {
         return phaseDao?.getPhases(meetingUUID)
     }
 
-    fun getPhase(phaseUUID: UUID?): LiveData<Phase?>? {
+    fun getPhase(phaseUUID: UUID?): Flow<Phase?>? {
         return phaseDao?.getPhase(phaseUUID)
     }
 
@@ -56,6 +58,5 @@ class MyScoutRepository {//private constructor() {
                 if (field == null) field = MyScoutRepository()
                 return field
             }
-            private set
     }
 }

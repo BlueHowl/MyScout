@@ -2,6 +2,7 @@ package be.helmo.myscout.database
 
 import android.location.Location
 import androidx.room.TypeConverter
+import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import java.util.*
 
@@ -27,16 +28,16 @@ class MyScoutTypeConverters {
     }
 
     @TypeConverter
-    fun toLocation(locationString: String?): Location? {
+    fun toLocation(locationString: String?): LatLng? {
         return try {
-            Gson().fromJson(locationString, Location::class.java)
+            Gson().fromJson(locationString, LatLng::class.java)
         } catch (e: Exception) {
             null
         }
     }
 
     @TypeConverter
-    fun toLocationString(location: Location?): String? {
+    fun toLocationString(location: LatLng?): String? {
         return Gson().toJson(location)
     }
 }

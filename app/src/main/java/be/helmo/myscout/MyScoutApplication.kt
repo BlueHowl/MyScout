@@ -6,7 +6,7 @@ import be.helmo.myscout.database.MyScoutDatabase
 class MyScoutApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        MyScoutDatabase.initDatabase(baseContext)
+        MyScoutDatabase.initDatabase(applicationContext)
     }
 
     override fun onTerminate() {

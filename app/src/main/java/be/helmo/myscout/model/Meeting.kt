@@ -3,6 +3,7 @@ package be.helmo.myscout.model
 import android.location.Location
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.android.gms.maps.model.LatLng
 import java.util.*
 
 @Entity
@@ -18,7 +19,7 @@ data class Meeting (
 
     var endDate: Date,
 
-    var startLocation: Location,
+    var startLocation: LatLng,
 
-    var endLocation: Location
+    var endLocation: LatLng
 )

@@ -16,17 +16,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="24sp"
-            android:text="@{}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Phase Name" />
 
         <TextView
-            android:id="@+id/place_date"
+            android:id="@+id/phase_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/phase_name"

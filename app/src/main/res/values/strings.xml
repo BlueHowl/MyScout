@@ -1,5 +1,21 @@
 <resources>
     <string name="app_name">MyScout</string>
+
+    <string name="app_name_meetings">MyScout - Réunions</string>
+    <string name="add_element">Ajouter un élement</string>
+    <string name="add_meeting">Ajouter une réunion</string>
+
+    <string name="btn_add">Ajouter</string>
+    <string name="btn_modify">Modifier</string>
+    <string name="btn_cancel">Annuler</string>
+
+    <string name="start_date_hour">Date et heure de début</string>
+    <string name="end_date_hour">Date et heure de fin</string>
+    <string name="start_location">Lieu de début</string>
+    <string name="end_location">Lieu de fin</string>
+    <string name="description_hint">Description</string>
+    <string name="story_hint">Histoire</string>
+
     <string name="add_phase">Ajouter une phase</string>
     <string name="phase_name_title">Nom de la phase : </string>
     <string name="phase_start_time_edit_title">Entrer l\'heure de début</string>
@@ -14,4 +30,6 @@
     <string name="phase_previous_photo">précédente</string>
     <string name="phase_next_photo">suivante</string>
     <string name="phase_pick_photos">ajouter</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

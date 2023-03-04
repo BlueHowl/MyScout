@@ -1,15 +1,14 @@
 package be.helmo.myscout.database.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import be.helmo.myscout.model.Meeting
-import be.helmo.myscout.model.Phase
+import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 @Dao
 interface MeetingDao {
     @get:Query("SELECT * FROM Meeting")
-    val meetings: LiveData<List<Meeting?>?>?
+    val meetings: Flow<List<Meeting?>?>?
 
     @Insert
     fun insert(meeting: Meeting?)
