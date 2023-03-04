@@ -13,29 +13,31 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import be.helmo.myscout.MainActivity
 import be.helmo.myscout.R
+import be.helmo.myscout.presenters.PhaseFragmentInterface
+import be.helmo.myscout.presenters.PhasePresenter
 import java.io.ByteArrayOutputStream
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.InputStream
 import java.util.*
 
 
-class PhaseFragment : Fragment() {
+class PhaseFragment : Fragment(), PhaseFragmentInterface {
+    private var presenter: PhasePresenter? = null
+
     private var images: ArrayList<Uri?>? = null
 
-    private var position = 0;
+    private var position = 0
 
-    private val PICK_IMAGES_CODE = 0
-    var timePicker: TimePicker? = null
-    var duringText: EditText? = null
-    var resumeText: EditText? = null
-    var phasePrevPhotosBtn: Button? = null
-    var phaseNextPhotosBtn: Button? = null
-    var phaseAddPhotosBtn: Button? = null
-    var phaseAbortBtn: Button? = null
-    var phaseValidateBtn: Button? = null
-    var imageSwitcher: ImageSwitcher? = null
+    private val pickImageCode = 0
+    private var timePicker: TimePicker? = null
+    private var duringText: EditText? = null
+    private var resumeText: EditText? = null
+    private var phasePrevPhotosBtn: Button? = null
+    private var phaseNextPhotosBtn: Button? = null
+    private var phaseAddPhotosBtn: Button? = null
+    private var phaseAbortBtn: Button? = null
+    private var phaseValidateBtn: Button? = null
+    private var imageSwitcher: ImageSwitcher? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.phase_fragment, container, false)
@@ -79,27 +81,27 @@ class PhaseFragment : Fragment() {
         }
 
         phaseAbortBtn?.setOnClickListener() {
-            // TODO
+            presenter?.abort()
         }
 
         phaseValidateBtn?.setOnClickListener() {
-            // TODO
+            presenter?.validate()
         }
         return view
     }
 
-    fun pickImagesIntent() {
+    private fun pickImagesIntent() {
         val intent = Intent()
         intent.type = "image/*"
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
         intent.action = Intent.ACTION_GET_CONTENT
-        startActivityForResult(Intent.createChooser(intent, "Choisir photo"), PICK_IMAGES_CODE)
+        startActivityForResult(Intent.createChooser(intent, "Choisir photo"), pickImageCode)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if(requestCode == PICK_IMAGES_CODE) {
+        if(requestCode == pickImageCode) {
             if(resultCode == Activity.RESULT_OK){
                 if(data!!.clipData != null){
                     val count = data.clipData!!.itemCount
@@ -108,22 +110,22 @@ class PhaseFragment : Fragment() {
                         images?.add(imageUri)
                     }
                     imageSwitcher?.setImageURI(images?.get(0))
-                    position = 0;
+                    position = 0
                 } else if(data.data != null){
                     val imageUri = compressUri(context, data.data)
                     images?.add(imageUri)
                     imageSwitcher?.setImageURI(imageUri)
-                    position = 0;
+                    position = 0
                 }
             }
         }
     }
 
-    fun getImageUri(inContext: Context?, inImage: Bitmap?): Uri? {
+    private fun getImageUri(inContext: Context?, inImage: Bitmap?): Uri? {
         val bytes = ByteArrayOutputStream()
         inImage?.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
         val path = MediaStore.Images.Media.insertImage(
-            inContext?.getContentResolver(),
+            inContext?.contentResolver,
             inImage,
             "Title",
             null
@@ -131,7 +133,7 @@ class PhaseFragment : Fragment() {
         return Uri.parse(path)
     }
 
-    fun compressUri(c: Context?, uri: Uri?): Uri? {
+    private fun compressUri(c: Context?, uri: Uri?): Uri? {
         val o = BitmapFactory.Options()
         o.inJustDecodeBounds = true
         BitmapFactory.decodeStream(c?.contentResolver?.openInputStream(uri!!), null, o)
@@ -141,9 +143,17 @@ class PhaseFragment : Fragment() {
     }
 
     companion object {
-        private const val TAG = "PhaseFragment"
-        fun newInstance(): PhaseFragment {
-            return PhaseFragment()
+        //private const val TAG = "PhaseFragment"
+        fun newInstance(mainActivity: MainActivity): PhaseFragment {
+            val phasePresenter = PhasePresenter()
+            phasePresenter.setView(mainActivity)
+            val fragment = PhaseFragment()
+            fragment.setPresenter(phasePresenter)
+            return fragment
         }
+    }
+
+    override fun setPresenter(presenter: PhasePresenter) {
+        this.presenter=presenter
     }
 }

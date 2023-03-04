@@ -23,6 +23,7 @@ class PhaseListFragment : Fragment() {
 
     interface ISelectPhase {
         fun onSelectedPhase(placeId: UUID?)
+        fun onAbortRequested()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
