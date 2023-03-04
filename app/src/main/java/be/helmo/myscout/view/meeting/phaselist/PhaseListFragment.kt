@@ -1,4 +1,4 @@
-package be.helmo.myscout.phaselist
+package be.helmo.myscout.view.meeting.phaselist
 
 import android.content.Context
 import android.os.Bundle

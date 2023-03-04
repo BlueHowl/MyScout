@@ -83,7 +83,7 @@ class MeetingListFragment : Fragment(), IMeetingPresenterCallback {
         //callback = null
     }
 
-    override fun onMeetingDataReady(meetingViewModels: List<MeetingViewModel>) {
+    override fun onMeetingDataReady(meetingViewModels: List<MeetingViewModel>) { //todo enlever list ?
         // Update the RecyclerView with the new data
         requireActivity().runOnUiThread {
             recyclerView?.adapter?.notifyDataSetChanged()

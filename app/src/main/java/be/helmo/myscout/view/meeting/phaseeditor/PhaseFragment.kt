@@ -1,4 +1,4 @@
-package be.helmo.myscout.phaseeditor
+package be.helmo.myscout.view.meeting.phaseeditor
 
 import android.app.Activity
 import android.content.Context

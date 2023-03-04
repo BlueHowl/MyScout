@@ -9,8 +9,8 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import be.helmo.myscout.phaselist.PhaseListFragment
-import be.helmo.myscout.phaseeditor.PhaseFragment
+import be.helmo.myscout.view.meeting.phaselist.PhaseListFragment
+import be.helmo.myscout.view.meeting.phaseeditor.PhaseFragment
 import java.util.*
 import be.helmo.myscout.view.meeting.EditMeetingFragment
 import be.helmo.myscout.view.meeting.meetinglist.MeetingListFragment
