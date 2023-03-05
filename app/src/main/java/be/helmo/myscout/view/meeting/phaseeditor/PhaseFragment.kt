@@ -92,6 +92,7 @@ class PhaseFragment : Fragment(), PhaseFragmentInterface {
                     resumeText?.text.toString(),
                     images
                 )
+                activity?.onBackPressed() //todo changer?
             }
         }
         return view
