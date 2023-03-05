@@ -7,10 +7,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import be.helmo.myscout.R
 import be.helmo.myscout.presenters.IMeetingRowView
-import be.helmo.myscout.view.interfaces.IMeetingPresenter
+import be.helmo.myscout.view.interfaces.IMeetingListPresenter
 
-class MeetingListAdapter(meetingListPresenter: IMeetingPresenter) : RecyclerView.Adapter<MeetingListAdapter.MeetingViewHolder?>() {
-    private var presenter: IMeetingPresenter? = meetingListPresenter
+class MeetingListAdapter(meetingListPresenter: IMeetingListPresenter) : RecyclerView.Adapter<MeetingListAdapter.MeetingViewHolder?>() {
+    private var presenter: IMeetingListPresenter? = meetingListPresenter
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MeetingViewHolder {
         return MeetingViewHolder(

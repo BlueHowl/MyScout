@@ -16,4 +16,6 @@ interface IMeetingPresenter {
                    description: String,
                    story: String)
 
+    fun removeMeeting(swipedItemPosition: Int)
+
 }

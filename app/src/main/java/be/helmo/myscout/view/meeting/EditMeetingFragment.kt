@@ -20,7 +20,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
-import be.helmo.myscout.view.interfaces.IMeetingPresenter
+import be.helmo.myscout.view.interfaces.IMeetingListPresenter
 
 import com.adevinta.leku.*
 import com.google.android.gms.maps.model.LatLng
@@ -36,7 +36,7 @@ const val ARG_PARAM_EDITMODE = "mode"
  */
 class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener {
-    lateinit var meetingPresenter: IMeetingPresenter
+    lateinit var meetingPresenter: IMeetingListPresenter
 
     var meetId: UUID? = null
     var editMode: Boolean = false
@@ -59,7 +59,7 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        meetingPresenter = PresenterSingletonFactory.instance!!.getMeetingPresenter(null)
+        meetingPresenter = PresenterSingletonFactory.instance!!.getMeetingPresenter()
 
         arguments?.let {
             meetId = it.getSerializable(ARG_PARAM_MEETID) as UUID?

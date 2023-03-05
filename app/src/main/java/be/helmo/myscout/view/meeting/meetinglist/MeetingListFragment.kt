@@ -1,22 +1,24 @@
 package be.helmo.myscout.view.meeting.meetinglist
 
 import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
 import be.helmo.myscout.factory.interfaces.IMeetingPresenterCallback
-import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
-import be.helmo.myscout.view.interfaces.IMeetingPresenter
+import be.helmo.myscout.view.interfaces.IMeetingListPresenter
 import java.util.*
 
 class MeetingListFragment : Fragment(), IMeetingPresenterCallback {
     var recyclerView: RecyclerView? = null
-    lateinit var meetingPresenter: IMeetingPresenter
+    lateinit var meetingPresenter: IMeetingListPresenter
 
     interface ISelectPhase {
         fun onSelectedPhase(placeId: UUID?)
@@ -25,7 +27,8 @@ class MeetingListFragment : Fragment(), IMeetingPresenterCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        meetingPresenter = PresenterSingletonFactory.instance!!.getMeetingPresenter(this)
+        meetingPresenter = PresenterSingletonFactory.instance!!.getMeetingListPresenter()
+        meetingPresenter.setMeetingListCallback(this)
 
         Log.d(TAG, "onCreate called")
     }
@@ -39,8 +42,52 @@ class MeetingListFragment : Fragment(), IMeetingPresenterCallback {
             val context = view.getContext()
             recyclerView = view
             recyclerView!!.layoutManager = LinearLayoutManager(context)
-            recyclerView!!.adapter =
-                MeetingListAdapter(meetingPresenter)
+            recyclerView!!.adapter = MeetingListAdapter(meetingPresenter)
+
+            val itemTouchHelper = ItemTouchHelper(object :
+                ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    if(direction == ItemTouchHelper.LEFT) {
+                        val swipedItemPosition = viewHolder.adapterPosition
+                        recyclerView!!.adapter!!.notifyItemRemoved(swipedItemPosition)
+                        meetingPresenter.removeMeeting(swipedItemPosition)
+                    }
+                }
+
+                override fun onChildDraw(
+                    c: Canvas,
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    dX: Float,
+                    dY: Float,
+                    actionState: Int,
+                    isCurrentlyActive: Boolean
+                ) {
+                    if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                        val itemView = viewHolder.itemView
+
+                        // Change the background color of the item view to red when swiped left
+                        if (dX < 0) {
+                            //itemView.setBackgroundResource(R.color.light_red)
+                            itemView.setBackgroundColor(Color.RED)
+                        } else {
+                            itemView.setBackgroundResource(R.color.transparent)
+                            itemView.setBackgroundColor(Color.TRANSPARENT)
+                        }
+                        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                    }
+                }
+            })
+
+            itemTouchHelper.attachToRecyclerView(recyclerView)
         }
 
         return view
@@ -83,10 +130,11 @@ class MeetingListFragment : Fragment(), IMeetingPresenterCallback {
         //callback = null
     }
 
-    override fun onMeetingDataReady(meetingViewModels: List<MeetingViewModel>) { //todo enlever list ?
+    override fun onMeetingDataAdd(meetingIndex: Int) { //todo enlever list ?
         // Update the RecyclerView with the new data
         requireActivity().runOnUiThread {
-            recyclerView?.adapter?.notifyDataSetChanged()
+            recyclerView?.adapter?.notifyItemChanged(meetingIndex)
+            //recyclerView?.adapter?.
         }
         //recyclerView?.adapter?.notifyDataSetChanged()
         //recyclerView?.adapter.updateData(meetingViewModels)

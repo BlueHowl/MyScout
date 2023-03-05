@@ -6,9 +6,10 @@ import be.helmo.myscout.database.repository.MyScoutRepository
 import be.helmo.myscout.factory.interfaces.IMeetingPresenterCallback
 import be.helmo.myscout.model.Meeting
 import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
-import be.helmo.myscout.view.interfaces.IMeetingPresenter
+import be.helmo.myscout.view.interfaces.IMeetingListPresenter
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.net.URL
@@ -16,73 +17,30 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class MeetingPresenter(myScoutRepository: MyScoutRepository, callback: IMeetingPresenterCallback?) : IMeetingPresenter, LifecycleService() {
-
+class MeetingPresenter(var myScoutRepository: MyScoutRepository
+) : IMeetingListPresenter, LifecycleService() {
+    var meetingList: ArrayList<Meeting> = ArrayList<Meeting>()
     var meetingViewModels: ArrayList<MeetingViewModel> = ArrayList<MeetingViewModel>()
 
-    var myScoutRepository: MyScoutRepository
-
-    val callback: IMeetingPresenterCallback?
+    var callback: IMeetingPresenterCallback? = null
 
     init {
-        this.myScoutRepository = myScoutRepository
-        this.callback = callback
-
-
-        /* fonctionne mais pas avec le getAddress
-        lifecycleScope.launch {
-            myScoutRepository.meetings?.collect { meetings ->
-                Log.d("deeeeee", "test")
-                if (meetings!!.isNotEmpty()) {
-                    for (meeting in meetings) {
+            GlobalScope.launch {
+                myScoutRepository.meetings?.take(1)?.collect { meetings ->
+                    for (meeting in meetings!!) {
                         val date = SimpleDateFormat("dd/MM/yyyy").format(meeting!!.startDate)
-                        meetingViewModels.add(
-                            MeetingViewModel(
-                                date,
-                                "getAddressString(meeting.startLocation)"
-                            )
-                        )
-                    }
-                }
-            }
-        }
-        */
-
-        /*
-        myScoutRepository.meetings?.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            ?.onEach {
-                Log.d("deeeeee", "test")
-                if (it!!.isNotEmpty()) {
-                    for (meeting in it) {
-                        val date = SimpleDateFormat("dd/MM/yyyy").format(meeting!!.startDate)
+                        meetingList.add(meeting)
                         meetingViewModels.add(
                             MeetingViewModel(
                                 date,
                                 getAddressString(meeting.startLocation)
                             )
                         )
+                        callback?.onMeetingDataAdd(meetingViewModels.size)
                     }
                 }
-            }!!.collect()//launchIn(lifecycleScope)
-        */
 
-        //todo faire attention (doit charger avant l'affichage)
-        GlobalScope.launch {
-            myScoutRepository.meetings?.collect { meetings ->
-                for (meeting in meetings!!) {
-                    val date = SimpleDateFormat("dd/MM/yyyy").format(meeting!!.startDate)
-                    meetingViewModels.add(
-                        MeetingViewModel(
-                            date,
-                            getAddressString(meeting.startLocation)
-                        )
-                    )
-                }
-
-                callback?.onMeetingDataReady(meetingViewModels)
             }
-
-        }
 
     }
 
@@ -104,6 +62,17 @@ class MeetingPresenter(myScoutRepository: MyScoutRepository, callback: IMeetingP
                    story: String) {
         val meet = Meeting(UUID.randomUUID(), description, story, Date(startDateHour), Date(endDateHour), startLocation, endLocation) //todo changer conversion dates
         myScoutRepository.insertMeeting(meet)
+
+        //add to recylclerview
+        GlobalScope.launch {
+            meetingViewModels.add(MeetingViewModel(startDateHour, getAddressString(startLocation)))
+            callback?.onMeetingDataAdd(meetingViewModels.size)
+        }
+    }
+
+    override fun removeMeeting(swipedItemPosition: Int) {
+        myScoutRepository.deleteMeeting(meetingList[swipedItemPosition])
+        meetingViewModels.removeAt(swipedItemPosition) //todo déjà remove ou pas ?
     }
 
     fun getAddressString(location: LatLng): String {
@@ -122,6 +91,10 @@ class MeetingPresenter(myScoutRepository: MyScoutRepository, callback: IMeetingP
             Log.d("loc address", address)
 
         return address
+    }
+
+    override fun setMeetingListCallback(iMeetingListCallback: IMeetingPresenterCallback?) {
+        callback = iMeetingListCallback
     }
 
 }
