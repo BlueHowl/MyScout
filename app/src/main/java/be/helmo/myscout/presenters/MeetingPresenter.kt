@@ -3,10 +3,12 @@ package be.helmo.myscout.presenters
 import android.util.Log
 import androidx.lifecycle.LifecycleService
 import be.helmo.myscout.database.repository.MyScoutRepository
-import be.helmo.myscout.factory.interfaces.IMeetingPresenterCallback
+import be.helmo.myscout.factory.interfaces.IMeetingRecyclerCallback
+import be.helmo.myscout.factory.interfaces.ISelectMeetingCallback
 import be.helmo.myscout.model.Meeting
 import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
-import be.helmo.myscout.view.interfaces.IMeetingListPresenter
+import be.helmo.myscout.view.interfaces.IMeetingRecyclerCallbackPresenter
+import be.helmo.myscout.view.interfaces.IMeetingSelectPhaseCallback
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.take
@@ -18,11 +20,12 @@ import java.util.*
 
 
 class MeetingPresenter(var myScoutRepository: MyScoutRepository
-) : IMeetingListPresenter, LifecycleService() {
+) : IMeetingRecyclerCallbackPresenter, IMeetingSelectPhaseCallback, LifecycleService() {
     var meetingList: ArrayList<Meeting> = ArrayList<Meeting>()
     var meetingViewModels: ArrayList<MeetingViewModel> = ArrayList<MeetingViewModel>()
 
-    var callback: IMeetingPresenterCallback? = null
+    var recylcerCallback: IMeetingRecyclerCallback? = null
+    var selectsMeetingCallback: ISelectMeetingCallback? = null
 
     init {
             GlobalScope.launch {
@@ -36,7 +39,7 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
                                 getAddressString(meeting.startLocation)
                             )
                         )
-                        callback?.onMeetingDataAdd(meetingViewModels.size)
+                        recylcerCallback?.onMeetingDataAdd(meetingViewModels.size)
                     }
                 }
 
@@ -51,7 +54,7 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
     }
 
     override fun getMeetingRowsCount() : Int {
-        return meetingViewModels.size;
+        return meetingViewModels.size
     }
 
     override fun addMeeting(startDateHour: String,
@@ -66,13 +69,25 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
         //add to recylclerview
         GlobalScope.launch {
             meetingViewModels.add(MeetingViewModel(startDateHour, getAddressString(startLocation)))
-            callback?.onMeetingDataAdd(meetingViewModels.size)
+            recylcerCallback?.onMeetingDataAdd(meetingViewModels.size)
         }
     }
 
     override fun removeMeeting(swipedItemPosition: Int) {
         myScoutRepository.deleteMeeting(meetingList[swipedItemPosition])
         meetingViewModels.removeAt(swipedItemPosition) //todo déjà remove ou pas ?
+    }
+
+    override fun goToMeeting(position: Int) {
+        selectsMeetingCallback?.onSelectedMeeting(meetingList[position].id)
+    }
+
+    override fun setMeetingListCallback(iMeetingListCallback: IMeetingRecyclerCallback?) {
+        recylcerCallback = iMeetingListCallback
+    }
+
+    override fun setSelectMeetingCallback(iSelectMeetingCallback: ISelectMeetingCallback?) {
+        selectsMeetingCallback = iSelectMeetingCallback
     }
 
     fun getAddressString(location: LatLng): String {
@@ -91,10 +106,6 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
             Log.d("loc address", address)
 
         return address
-    }
-
-    override fun setMeetingListCallback(iMeetingListCallback: IMeetingPresenterCallback?) {
-        callback = iMeetingListCallback
     }
 
 }

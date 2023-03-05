@@ -1,5 +1,5 @@
 package be.helmo.myscout.factory.interfaces
 
-interface IMeetingPresenterCallback {
+interface IMeetingRecyclerCallback {
     fun onMeetingDataAdd(meetingViewModels: Int)
 }

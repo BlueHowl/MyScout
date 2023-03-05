@@ -18,4 +18,6 @@ interface IMeetingPresenter {
 
     fun removeMeeting(swipedItemPosition: Int)
 
+    fun goToMeeting(position: Int)
+
 }

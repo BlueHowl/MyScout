@@ -10,7 +10,7 @@ class PhasePresenter {
     }
 
     fun abort() {
-        mainView?.onAbortRequested()
+        //mainView?.onAbortRequested()
     }
 
     fun validate() {

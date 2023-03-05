@@ -3,7 +3,6 @@ package be.helmo.myscout.view.meeting.meetinglist
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
@@ -15,23 +14,23 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
-import be.helmo.myscout.factory.interfaces.IMeetingPresenterCallback
-import be.helmo.myscout.view.interfaces.IMeetingListPresenter
-import java.util.*
+import be.helmo.myscout.factory.interfaces.IMeetingRecyclerCallback
+import be.helmo.myscout.view.interfaces.IMeetingRecyclerCallbackPresenter
 import kotlin.math.absoluteValue
 
-class MeetingListFragment : Fragment(), IMeetingPresenterCallback {
+class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
     var recyclerView: RecyclerView? = null
-    lateinit var meetingPresenter: IMeetingListPresenter
+    lateinit var meetingPresenter: IMeetingRecyclerCallbackPresenter
 
+    /*
     interface ISelectPhase {
         fun onSelectedPhase(placeId: UUID?)
-    }
+    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        meetingPresenter = PresenterSingletonFactory.instance!!.getMeetingListPresenter()
+        meetingPresenter = PresenterSingletonFactory.instance!!.getRecyclerCallbackMeetingPresenter()
         meetingPresenter.setMeetingListCallback(this)
 
         Log.d(TAG, "onCreate called")
