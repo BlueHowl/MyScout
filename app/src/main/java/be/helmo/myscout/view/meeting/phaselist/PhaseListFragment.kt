@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +15,7 @@ import be.helmo.myscout.model.Phase
 import be.helmo.myscout.view.meeting.ARG_PARAM_EDITMODE
 import be.helmo.myscout.view.meeting.ARG_PARAM_MEETID
 import be.helmo.myscout.view.meeting.EditMeetingFragment
+import be.helmo.myscout.view.meeting.meetinglist.MeetingListFragment
 import com.google.android.gms.maps.model.LatLng
 import java.util.*
 
@@ -75,6 +77,10 @@ class PhaseListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated called")
+
+        val menuTitle = requireActivity().findViewById<TextView>(R.id.menu_title)
+        menuTitle.text = getString(R.string.app_name_phases)
+
         /*
         phaseListViewModel = ViewModelProvider(requireActivity()).get(
             PhaseListViewModel::class.java

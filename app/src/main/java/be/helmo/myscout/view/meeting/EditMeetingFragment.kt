@@ -10,10 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.DatePicker
-import android.widget.EditText
-import android.widget.TimePicker
+import android.widget.*
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,6 +18,7 @@ import androidx.fragment.app.Fragment
 import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
 import be.helmo.myscout.view.interfaces.IMeetingRecyclerCallbackPresenter
+import be.helmo.myscout.view.meeting.meetinglist.MeetingListFragment
 
 import com.adevinta.leku.*
 import com.google.android.gms.maps.model.LatLng
@@ -150,6 +148,14 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Log.d("EditMeetingFragment", "onViewCreated called")
+
+        val menuTitle = requireActivity().findViewById<TextView>(R.id.menu_title)
+        menuTitle.text = getString(R.string.app_meeting_edit_title)
     }
 
     //datehours

@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -88,6 +89,14 @@ class PhaseFragment : Fragment(), PhaseFragmentInterface {
             presenter?.validate()
         }
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Log.d("PhaseFragment", "onViewCreated called")
+
+        val menuTitle = requireActivity().findViewById<TextView>(R.id.menu_title)
+        menuTitle.text = getString(R.string.app_phase_edit_title)
     }
 
     private fun pickImagesIntent() {

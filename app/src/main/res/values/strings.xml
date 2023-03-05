@@ -2,6 +2,10 @@
     <string name="app_name">MyScout</string>
 
     <string name="app_name_meetings">MyScout - Réunions</string>
+    <string name="app_name_phases">MyScout - Phases</string>
+    <string name="app_meeting_edit_title">Editer une réunion</string>
+    <string name="app_phase_edit_title">Editer une phase</string>
+
     <string name="add_element">Ajouter un élement</string>
     <string name="add_meeting">Ajouter une réunion</string>
 

@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import android.view.Window
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -19,6 +20,7 @@ import be.helmo.myscout.view.meeting.phaselist.PhaseListFragment
 
 
 class MainActivity : AppCompatActivity(), ISelectMeetingCallback {
+    lateinit var menuTitle: TextView
     lateinit var meetingAdd: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,6 +31,7 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback {
 
         appContext = applicationContext
 
+        menuTitle = findViewById(R.id.menu_title)
         meetingAdd = findViewById(R.id.add_element)
         meetingAdd.setOnClickListener(::onAddElementClick)
 
@@ -80,6 +83,8 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback {
             fragmentTransaction.commit()
         }
     }
+
+    //todo ajouter callback retour au fragment principal
 
     /**
      * Permet de récupèrer le context

@@ -7,11 +7,13 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import be.helmo.myscout.MainActivity
 import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
 import be.helmo.myscout.factory.interfaces.IMeetingRecyclerCallback
@@ -129,6 +131,9 @@ class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated called")
+
+        val menuTitle = requireActivity().findViewById<TextView>(R.id.menu_title)
+        menuTitle.text = getString(R.string.app_name_meetings)
     }
 
     override fun onAttach(context: Context) {
