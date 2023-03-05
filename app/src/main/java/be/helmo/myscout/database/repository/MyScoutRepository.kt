@@ -5,6 +5,7 @@ import be.helmo.myscout.database.MyScoutDatabase
 import be.helmo.myscout.model.Meeting
 import be.helmo.myscout.model.Phase
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.take
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -18,6 +19,10 @@ class MyScoutRepository {//private constructor() {
     val meetings: Flow<List<Meeting?>?>?
         get() = meetingDao?.meetings
 
+    // get a meeting by its UUID
+    fun getMeeting(meetingUUID: UUID?): Meeting? {
+        return null;
+    }
     fun insertMeeting(meeting: Meeting?) {
         Log.d("meetingDao", meetingDao?.meetings.toString()) //null wtf
         executor.execute { meetingDao?.insert(meeting) }

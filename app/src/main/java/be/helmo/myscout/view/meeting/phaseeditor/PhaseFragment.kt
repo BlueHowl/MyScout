@@ -30,7 +30,6 @@ class PhaseFragment : Fragment(), PhaseFragmentInterface {
     private var position = 0
 
     private val pickImageCode = 0
-    private var timePicker: TimePicker? = null
     private var duringText: EditText? = null
     private var resumeText: EditText? = null
     private var phasePrevPhotosBtn: Button? = null
@@ -41,11 +40,10 @@ class PhaseFragment : Fragment(), PhaseFragmentInterface {
     private var imageSwitcher: ImageSwitcher? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.phase_fragment, container, false)
+        val view = inflater.inflate(R.layout.fragment_edit_phase, container, false)
 
         // link des composants
         images = ArrayList()
-        timePicker = view.findViewById(R.id.phase_start_time)
         duringText = view.findViewById(R.id.phase_during)
         resumeText = view.findViewById(R.id.phase_resume)
         phasePrevPhotosBtn = view.findViewById(R.id.phase_previous_photo_btn)
@@ -82,11 +80,19 @@ class PhaseFragment : Fragment(), PhaseFragmentInterface {
         }
 
         phaseAbortBtn?.setOnClickListener() {
-            presenter?.abort()
+            activity?.onBackPressed() //todo changer?
         }
 
         phaseValidateBtn?.setOnClickListener() {
-            presenter?.validate()
+            if(duringText?.text.toString().isEmpty() || resumeText?.text.toString().isEmpty())
+                Toast.makeText(context, "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show()
+            else{
+                presenter?.addPhase(
+                    duringText?.text.toString(),
+                    resumeText?.text.toString(),
+                    images
+                )
+            }
         }
         return view
     }

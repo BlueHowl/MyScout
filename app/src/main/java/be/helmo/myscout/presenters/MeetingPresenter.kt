@@ -65,7 +65,7 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
                    story: String) {
         val meet = Meeting(UUID.randomUUID(), description, story, Date(startDateHour), Date(endDateHour), startLocation, endLocation) //todo changer conversion dates
         myScoutRepository.insertMeeting(meet)
-
+        meetingList.add(meet)
         //add to recylclerview
         GlobalScope.launch {
             meetingViewModels.add(MeetingViewModel(startDateHour, getAddressString(startLocation)))
@@ -75,6 +75,7 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
 
     override fun removeMeeting(swipedItemPosition: Int) {
         myScoutRepository.deleteMeeting(meetingList[swipedItemPosition])
+        meetingList.removeAt(swipedItemPosition)
         meetingViewModels.removeAt(swipedItemPosition) //todo déjà remove ou pas ?
     }
 

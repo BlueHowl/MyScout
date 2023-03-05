@@ -18,4 +18,5 @@ interface MeetingDao {
 
     @Delete
     fun delete(meeting: Meeting?)
+
 }

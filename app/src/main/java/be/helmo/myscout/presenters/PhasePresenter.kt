@@ -1,5 +1,6 @@
 package be.helmo.myscout.presenters
 
+import android.net.Uri
 import be.helmo.myscout.MainActivity
 
 class PhasePresenter {
@@ -7,6 +8,9 @@ class PhasePresenter {
 
     fun setView(mainView: MainActivity) {
         this.mainView = mainView
+    }
+    fun addPhase(during: String, resume: String, images: ArrayList<Uri?>?) {
+        //mainView?.onAddPhaseRequested()
     }
 
     fun abort() {
