@@ -127,9 +127,9 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                     Log.d("LONGITUDE", longitude.toString())
 
                     val address = data?.getStringExtra(LOCATION_ADDRESS)
-                    Log.d("ADDRESS****", address.toString())
+                    Log.d("ADDRESS", address.toString())
                     val postalcode = data?.getStringExtra(ZIPCODE)
-                    Log.d("POSTALCODE****", postalcode.toString())
+                    Log.d("POSTALCODE", postalcode.toString())
 
                     val addressForBtn = String.format("%s %s", address.toString(), postalcode.toString())
 

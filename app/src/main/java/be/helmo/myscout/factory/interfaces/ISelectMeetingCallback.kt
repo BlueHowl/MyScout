@@ -1,9 +1,9 @@
 package be.helmo.myscout.factory.interfaces
 
-import java.util.*
+import be.helmo.myscout.model.Meeting
 
 interface ISelectMeetingCallback {
 
-    fun onSelectedMeeting(meetingId: UUID?)
+    fun onSelectedMeeting(meeting: Meeting)
 
 }

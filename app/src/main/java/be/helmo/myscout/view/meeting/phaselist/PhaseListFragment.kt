@@ -9,7 +9,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import be.helmo.myscout.R
+import be.helmo.myscout.model.Meeting
 import be.helmo.myscout.model.Phase
+import be.helmo.myscout.view.meeting.ARG_PARAM_EDITMODE
+import be.helmo.myscout.view.meeting.ARG_PARAM_MEETID
+import be.helmo.myscout.view.meeting.EditMeetingFragment
+import com.google.android.gms.maps.model.LatLng
 import java.util.*
 
 /**
@@ -21,6 +26,8 @@ class PhaseListFragment : Fragment() {
     var recyclerView: RecyclerView? = null
     var callback: ISelectPhase? = null
 
+    lateinit var meeting: Meeting
+
     interface ISelectPhase {
         fun onSelectedPhase(placeId: UUID?)
         fun onAbortRequested()
@@ -29,6 +36,21 @@ class PhaseListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate called")
+
+        arguments?.let {
+            val meetId = it.getSerializable("meetId") as UUID
+            val description = it.getString("description")
+            val story = it.getString("story")
+
+            val startDate = it.getSerializable("startDate") as Date
+            val endDate = it.getSerializable("endDate") as Date
+
+            val startLocation = LatLng(it.getDouble("startLocLat"), it.getDouble("startLocLon"))
+            val endLocation = LatLng(it.getDouble("endLocLat"), it.getDouble("endLocLon"))
+
+            meeting = Meeting(meetId, description, story, startDate, endDate, startLocation, endLocation)
+        }
+
     }
 
     override fun onCreateView(
@@ -107,8 +129,26 @@ class PhaseListFragment : Fragment() {
 
     companion object {
         private const val TAG = "PhaseListFragment"
-        fun newInstance(): PhaseListFragment {
-            return PhaseListFragment()
+        fun newInstance(meeting: Meeting): PhaseListFragment {
+            val fragment = PhaseListFragment()
+
+            val args = Bundle()
+            args.putSerializable("meetId", meeting.id)
+
+            args.putString("description", meeting.description)
+            args.putString("story", meeting.description)
+            args.putSerializable("meetId", meeting.id)
+
+            args.putSerializable("startDate", meeting.startDate)
+            args.putSerializable("endDate", meeting.endDate)
+
+            args.putDouble("startLocLat", meeting.startLocation.latitude)
+            args.putDouble("startLocLon", meeting.startLocation.longitude)
+            args.putDouble("endLocLat", meeting.endLocation.latitude)
+            args.putDouble("endLocLon", meeting.endLocation.longitude)
+            fragment.arguments = args
+
+            return fragment
         }
     }
 }

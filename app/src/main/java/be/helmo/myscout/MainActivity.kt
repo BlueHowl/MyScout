@@ -11,13 +11,15 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import be.helmo.myscout.factory.PresenterSingletonFactory
 import be.helmo.myscout.factory.interfaces.ISelectMeetingCallback
+import be.helmo.myscout.model.Meeting
 import java.util.*
 import be.helmo.myscout.view.meeting.EditMeetingFragment
 import be.helmo.myscout.view.meeting.meetinglist.MeetingListFragment
+import be.helmo.myscout.view.meeting.phaselist.PhaseListFragment
 
 
 class MainActivity : AppCompatActivity(), ISelectMeetingCallback {
-    private val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+    val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
     override fun onCreate(savedInstanceState: Bundle?) {
         this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         //this.window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
@@ -35,8 +37,13 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback {
         mainMenu()
     }
 
-    override fun onSelectedMeeting(meetingId: UUID?) {
-
+    override fun onSelectedMeeting(meeting: Meeting) {
+        val fragment = PhaseListFragment.newInstance(meeting)
+        val fragmentManager: FragmentManager = supportFragmentManager
+        val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.replace(R.id.fragment_container, fragment)
+        fragmentTransaction.addToBackStack(null)
+        fragmentTransaction.commit()
     }
 
     /* todo doit aller dans onAddElementClick : definir une variable qui change l'action du bouton d'ajout
@@ -56,7 +63,7 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback {
         val fragmentManager: FragmentManager = this.supportFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragment_container, fragment)
-        fragmentTransaction.addToBackStack("")
+        fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }
 

@@ -21,8 +21,8 @@ import java.util.*
 
 class MeetingPresenter(var myScoutRepository: MyScoutRepository
 ) : IMeetingRecyclerCallbackPresenter, IMeetingSelectPhaseCallback, LifecycleService() {
-    var meetingList: ArrayList<Meeting> = ArrayList<Meeting>()
-    var meetingViewModels: ArrayList<MeetingViewModel> = ArrayList<MeetingViewModel>()
+    var meetingList: ArrayList<Meeting> = ArrayList<Meeting>() //liste meetings
+    var meetingViewModels: ArrayList<MeetingViewModel> = ArrayList<MeetingViewModel>() //list meetings ViewModels
 
     var recylcerCallback: IMeetingRecyclerCallback? = null
     var selectsMeetingCallback: ISelectMeetingCallback? = null
@@ -79,7 +79,7 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
     }
 
     override fun goToMeeting(position: Int) {
-        selectsMeetingCallback?.onSelectedMeeting(meetingList[position].id)
+        selectsMeetingCallback?.onSelectedMeeting(meetingList[position])
     }
 
     override fun setMeetingListCallback(iMeetingListCallback: IMeetingRecyclerCallback?) {
