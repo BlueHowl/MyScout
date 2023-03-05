@@ -12,14 +12,15 @@ import androidx.fragment.app.FragmentTransaction
 import be.helmo.myscout.factory.PresenterSingletonFactory
 import be.helmo.myscout.factory.interfaces.ISelectMeetingCallback
 import be.helmo.myscout.model.Meeting
-import java.util.*
 import be.helmo.myscout.view.meeting.EditMeetingFragment
 import be.helmo.myscout.view.meeting.meetinglist.MeetingListFragment
+import be.helmo.myscout.view.meeting.phaseeditor.PhaseFragment
 import be.helmo.myscout.view.meeting.phaselist.PhaseListFragment
 
 
 class MainActivity : AppCompatActivity(), ISelectMeetingCallback {
-    val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+    lateinit var meetingAdd: ImageView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         //this.window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
@@ -28,13 +29,15 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback {
 
         appContext = applicationContext
 
-        val meetingAdd = findViewById<ImageView>(R.id.add_element)
+        meetingAdd = findViewById(R.id.add_element)
         meetingAdd.setOnClickListener(::onAddElementClick)
 
         val meetingPresenter = PresenterSingletonFactory.instance!!.getSelectPhaseCallbackMeetingPresenter()
         meetingPresenter.setSelectMeetingCallback(this)
 
-        mainMenu()
+        //affiche le premier fragment
+        supportFragmentManager.beginTransaction()
+            .add(R.id.fragment_container, MeetingListFragment.newInstance()).commit()
     }
 
     override fun onSelectedMeeting(meeting: Meeting) {
@@ -59,18 +62,22 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback {
     fun onAddElementClick(view: View) {
         Log.d("click", "Add element")
 
-        val fragment = EditMeetingFragment.newInstance(null, false)
-        val fragmentManager: FragmentManager = this.supportFragmentManager
-        val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.fragment_container, fragment)
-        fragmentTransaction.addToBackStack(null)
-        fragmentTransaction.commit()
-    }
-
-    fun mainMenu() { //todo (affichage une fois) et back sur les autres fragments pour revenir là, pas besoin de recréer
-        if (currentFragment == null) {
-            supportFragmentManager.beginTransaction()
-                .add(R.id.fragment_container, MeetingListFragment.newInstance()).commit()
+        if(supportFragmentManager.findFragmentById(R.id.fragment_container) is MeetingListFragment) {
+            //si on est dans meetingList alors on affiche fragment création de meeting
+            val fragment = EditMeetingFragment.newInstance(null, false)
+            val fragmentManager: FragmentManager = this.supportFragmentManager
+            val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+            fragmentTransaction.replace(R.id.fragment_container, fragment)
+            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.commit()
+        } else if(supportFragmentManager.findFragmentById(R.id.fragment_container) is PhaseListFragment) {
+            //todo changer le parametre de newInstance
+            val fragment = PhaseFragment.newInstance(MainActivity())
+            val fragmentManager: FragmentManager = supportFragmentManager
+            val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+            fragmentTransaction.replace(R.id.fragment_container, fragment)
+            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.commit()
         }
     }
 

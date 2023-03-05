@@ -61,13 +61,14 @@ class PhaseListFragment : Fragment() {
         val view: View = inflater.inflate(R.layout.fragment_phase_list, container, false)
 
         // Set the adapter
+        /*
         if (view is RecyclerView) {
             val context = view.getContext()
             recyclerView = view
             recyclerView!!.layoutManager = LinearLayoutManager(context)
             recyclerView!!.adapter =
                 PhaseAdapter(emptyList(), callback!!)
-        }
+        }*/
         return view
     }
 
@@ -108,13 +109,13 @@ class PhaseListFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         Log.d(TAG, "onAttach called")
-        callback = context as ISelectPhase
+        //callback = context as ISelectPhase
     }
 
     override fun onDetach() {
         super.onDetach()
         Log.d(TAG, "onDetach called")
-        callback = null
+        //callback = null
     }
 
     /*
