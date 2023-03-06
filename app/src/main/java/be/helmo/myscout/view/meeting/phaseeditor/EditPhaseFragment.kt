@@ -22,8 +22,8 @@ import java.io.ByteArrayOutputStream
 import java.util.*
 
 
-class PhaseFragment : Fragment(), PhaseFragmentInterface {
-    private var presenter: PhasePresenter? = null
+class EditPhaseFragment : Fragment(), PhaseFragmentInterface {
+    lateinit var presenter: PhasePresenter
 
     private var images: ArrayList<Uri?>? = null
 
@@ -90,7 +90,7 @@ class PhaseFragment : Fragment(), PhaseFragmentInterface {
                 presenter?.addPhase(
                     duringText?.text.toString(),
                     resumeText?.text.toString(),
-                    images
+                    images.toString()
                 )
                 activity?.onBackPressed() //todo changer?
             }
@@ -160,10 +160,9 @@ class PhaseFragment : Fragment(), PhaseFragmentInterface {
 
     companion object {
         //private const val TAG = "PhaseFragment"
-        fun newInstance(mainActivity: MainActivity): PhaseFragment {
+        fun newInstance(mainActivity: MainActivity): EditPhaseFragment {
             val phasePresenter = PhasePresenter()
-            phasePresenter.setView(mainActivity)
-            val fragment = PhaseFragment()
+            val fragment = EditPhaseFragment()
             fragment.setPresenter(phasePresenter)
             return fragment
         }

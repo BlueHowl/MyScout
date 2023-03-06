@@ -19,7 +19,6 @@ class MyScoutRepository {//private constructor() {
     val meetings: Flow<List<Meeting?>?>?
         get() = meetingDao?.meetings
 
-    // get a meeting by its UUID
     fun getMeeting(meetingUUID: UUID?): Meeting? {
         return null;
     }
