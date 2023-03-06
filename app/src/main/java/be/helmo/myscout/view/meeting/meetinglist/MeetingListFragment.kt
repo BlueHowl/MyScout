@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -67,6 +68,7 @@ class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
                     }
                 }
 
+                //transition couleur
                 override fun onChildDraw(
                     c: Canvas,
                     recyclerView: RecyclerView,
@@ -78,10 +80,9 @@ class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
                 ) {
                     if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
                         val itemView = viewHolder.itemView
+                        val background = ColorDrawable(ContextCompat.getColor(itemView.context, R.color.red))
 
-                        // Change the background color of the item view to red when swiped left
                         if (dX < 0) {
-                            val background = ColorDrawable(ContextCompat.getColor(itemView.context, R.color.red))
                             val swipeWidthPercentage = (dX.absoluteValue * 2 / itemView.width.toFloat()).coerceIn(0f, 1f)
 
                             ValueAnimator.ofInt(0, (255 * swipeWidthPercentage).toInt()).apply {
@@ -94,7 +95,6 @@ class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
                                 start()
                             }
 
-                            // Draw the background color and icon
                             background.setBounds(
                                 itemView.right + dX.toInt(),
                                 itemView.top,
@@ -103,18 +103,8 @@ class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
                             )
                             background.draw(c)
 
-                            //itemView.setBackgroundResource(R.color.light_red)
-
-                            /*
-                            itemView.animate()
-                                .setDuration(0)
-                                .alpha(swipeWidthPercentage)
-                                .withEndAction { itemView.alpha = swipeWidthPercentage }
-                                .start()
-
-                             */
                         } else {
-                            itemView.setBackgroundResource(R.color.transparent)
+                            background.alpha = 0
                         }
 
                         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
@@ -132,8 +122,13 @@ class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated called")
 
+        //change le titre du menu
         val menuTitle = requireActivity().findViewById<TextView>(R.id.menu_title)
         menuTitle.text = getString(R.string.app_name_meetings)
+
+        //rend le btn add_element visible
+        val addElement = requireActivity().findViewById<ImageView>(R.id.add_element)
+        addElement.visibility = View.VISIBLE
     }
 
     override fun onAttach(context: Context) {

@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.meeting.phaseeditor.EditPhaseFragment"
-    android:orientation="vertical">
+    android:layout_margin="12dp"
+    android:orientation="vertical"
+    tools:context=".view.phases.EditPhaseFragment">
 
     <TextView
         android:layout_width="match_parent"
@@ -39,7 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
-        android:text="@string/phase_adding_photo_title"/>
+        android:text="@string/phase_adding_photo_title" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -49,57 +50,58 @@
             android:id="@+id/phase_image_switcher"
             android:layout_width="match_parent"
             android:layout_height="250dp"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:scaleType="fitXY" />
 
         <LinearLayout
             android:id="@+id/phase_image_switcher_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/phase_image_switcher"
             android:layout_gravity="bottom"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="12dp"
             android:layout_marginBottom="12dp"
-            android:orientation="horizontal"
-            android:layout_below="@id/phase_image_switcher">
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/phase_previous_photo_btn"
-                android:text="@string/phase_previous_photo"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
+                android:layout_below="@id/phase_image_switcher"
                 android:layout_marginEnd="12dp"
                 android:layout_weight="1"
-                android:layout_below="@id/phase_image_switcher" />
+                android:text="@string/phase_previous_photo" />
 
             <Button
                 android:id="@+id/phase_next_photo_btn"
-                android:text="@string/phase_next_photo"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_weight="1"
+                android:layout_below="@id/phase_image_switcher"
                 android:layout_alignParentEnd="true"
-                android:layout_below="@id/phase_image_switcher" />
+                android:layout_weight="1"
+                android:text="@string/phase_next_photo" />
 
         </LinearLayout>
 
         <Button
             android:id="@+id/phase_pick_photos_btn"
-            android:text="@string/phase_pick_photos"
             android:layout_width="match_parent"
             android:layout_height="60dp"
+            android:layout_below="@id/phase_image_switcher_buttons"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="12dp"
             android:layout_weight="1"
-            android:layout_below="@id/phase_image_switcher_buttons" />
+            android:text="@string/phase_pick_photos" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
             android:layout_gravity="bottom"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="12dp"
-            android:orientation="horizontal"
-            android:layout_alignParentBottom="true">
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/phase_abort_btn"

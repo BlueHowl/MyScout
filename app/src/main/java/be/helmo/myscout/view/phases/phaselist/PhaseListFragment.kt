@@ -1,9 +1,10 @@
-package be.helmo.myscout.view.meeting.phaselist
+package be.helmo.myscout.view.phases.phaselist
 
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -78,8 +79,13 @@ class PhaseListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated called")
 
+        //change le titre du menu
         val menuTitle = requireActivity().findViewById<TextView>(R.id.menu_title)
         menuTitle.text = getString(R.string.app_name_phases)
+
+        //rend le btn add element visible
+        val addElement = requireActivity().findViewById<ImageView>(R.id.add_element)
+        addElement.visibility = View.VISIBLE
 
         /*
         phaseListViewModel = ViewModelProvider(requireActivity()).get(

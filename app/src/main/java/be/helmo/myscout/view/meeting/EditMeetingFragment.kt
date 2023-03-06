@@ -154,8 +154,13 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         super.onViewCreated(view, savedInstanceState)
         Log.d("EditMeetingFragment", "onViewCreated called")
 
+        //change le titre du menu
         val menuTitle = requireActivity().findViewById<TextView>(R.id.menu_title)
         menuTitle.text = getString(R.string.app_meeting_edit_title)
+
+        //rend invisible le btn add_element
+        val addElement = requireActivity().findViewById<ImageView>(R.id.add_element)
+        addElement.visibility = View.GONE
     }
 
     //datehours

@@ -15,8 +15,8 @@ import be.helmo.myscout.factory.interfaces.ISelectMeetingCallback
 import be.helmo.myscout.model.Meeting
 import be.helmo.myscout.view.meeting.EditMeetingFragment
 import be.helmo.myscout.view.meeting.meetinglist.MeetingListFragment
-import be.helmo.myscout.view.meeting.phaseeditor.EditPhaseFragment
-import be.helmo.myscout.view.meeting.phaselist.PhaseListFragment
+import be.helmo.myscout.view.phases.EditPhaseFragment
+import be.helmo.myscout.view.phases.phaselist.PhaseListFragment
 
 
 class MainActivity : AppCompatActivity(), ISelectMeetingCallback {
@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback {
             fragmentTransaction.commit()
         } else if(supportFragmentManager.findFragmentById(R.id.fragment_container) is PhaseListFragment) {
             //todo changer le parametre de newInstance
-            val fragment = EditPhaseFragment.newInstance(MainActivity())
+            val fragment = EditPhaseFragment.newInstance()
             val fragmentManager: FragmentManager = supportFragmentManager
             val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
             fragmentTransaction.replace(R.id.fragment_container, fragment)

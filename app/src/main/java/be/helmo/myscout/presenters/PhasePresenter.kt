@@ -1,10 +1,13 @@
 package be.helmo.myscout.presenters
 
+import android.graphics.Bitmap
+import android.net.Uri
 import be.helmo.myscout.database.repository.MyScoutRepository
 import be.helmo.myscout.factory.interfaces.IPhaseRecyclerCallback
 import be.helmo.myscout.factory.interfaces.ISelectPhaseCallback
 import be.helmo.myscout.model.Phase
 import be.helmo.myscout.presenters.viewmodel.PhaseViewModel
+import be.helmo.myscout.repositories.IImageRepository
 import be.helmo.myscout.view.interfaces.IPhaseRecyclerCallbackPresenter
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.take
@@ -12,7 +15,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PhasePresenter(var myScoutRepository: MyScoutRepository) : IPhaseRecyclerCallbackPresenter {
+class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageRepository: IImageRepository) : IPhaseRecyclerCallbackPresenter {
     var phaseList: ArrayList<Phase> = ArrayList<Phase>() //liste meetings
     var phaseViewModels: ArrayList<PhaseViewModel> = ArrayList<PhaseViewModel>() //list meetings ViewModels
 
@@ -36,24 +39,28 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository) : IPhaseRecyclerC
                             )
                         )
                     startTime = getRightTime(startTime!!, phases[i]?.duration.toString())
-                    recylcerCallback?.onPhaseDataAdd(phaseViewModels.size)
+                    //recylcerCallback?.onPhaseDataAdd(phaseViewModels.size)
                 }
             }
         }
     }
 
-    private fun getRightTime(startTime: Date, duration: String): Date {
+    fun getRightTime(startTime: Date, duration: String): Date {
         val time = startTime.time
         val minutes = duration.split(":")[1].toInt()
         val durationTime = minutes * 60 * 1000
         return Date(time + durationTime)
     }
 
+    override fun saveImage(imageToSave: Bitmap) : Uri {
+        return imageRepository.createDirectoryAndSaveImage(imageToSave, "phase2565")
+    }
+
     override fun onBindPhaseRowViewAtPosition(position: Int, rowView: IPhaseRowView) {
-        val phase = phaseViewModels[position]
+        /*val phase = phaseViewModels[position]
         rowView.setTitle(phase.title)
         rowView.setDuration(phase.duration)
-        rowView.setDescription(phase.description)
+        rowView.setDescription(phase.description)*/
     }
 
     override fun getPhaseRowsCount(): Int {

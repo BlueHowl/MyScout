@@ -1,19 +1,21 @@
 package be.helmo.myscout.factory
 
 import be.helmo.myscout.database.repository.MyScoutRepository
+import be.helmo.myscout.imageRepository.ImageRepository
 import be.helmo.myscout.presenters.MeetingPresenter
 import be.helmo.myscout.presenters.PhasePresenter
+import be.helmo.myscout.repositories.IImageRepository
 import be.helmo.myscout.view.interfaces.IMeetingRecyclerCallbackPresenter
 import be.helmo.myscout.view.interfaces.IMeetingSelectPhaseCallback
 import be.helmo.myscout.view.interfaces.IPhaseRecyclerCallbackPresenter
 
 class PresenterSingletonFactory() {
 
-    private val myScoutRepository: MyScoutRepository = MyScoutRepository.instance!!
+    val myScoutRepository: MyScoutRepository = MyScoutRepository.instance!!
+    val imageRepository: IImageRepository = ImageRepository()
 
-    private val meetingPresenter: MeetingPresenter = MeetingPresenter(myScoutRepository)
-
-    private val phasePresenter: PhasePresenter = PhasePresenter(myScoutRepository)
+    val meetingPresenter: MeetingPresenter = MeetingPresenter(myScoutRepository)
+    val phasePresenter: PhasePresenter = PhasePresenter(myScoutRepository, imageRepository)
 
     fun getRecyclerCallbackMeetingPresenter(): IMeetingRecyclerCallbackPresenter {
         return meetingPresenter

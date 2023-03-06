@@ -1,4 +1,4 @@
-package be.helmo.myscout.view.meeting.phaselist
+package be.helmo.myscout.view.phases.phaselist
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import be.helmo.myscout.R
 import be.helmo.myscout.databinding.PhaseListItemBinding
 import be.helmo.myscout.model.Phase
-import be.helmo.myscout.view.meeting.phaselist.PhaseListFragment.ISelectPhase
+import be.helmo.myscout.view.phases.phaselist.PhaseListFragment.ISelectPhase
 
 class PhaseAdapter(private val phases: List<Phase>, private val callBacks: ISelectPhase) :
     RecyclerView.Adapter<PhaseAdapter.ViewHolder>() {
