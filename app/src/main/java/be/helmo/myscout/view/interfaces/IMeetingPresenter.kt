@@ -1,6 +1,6 @@
 package be.helmo.myscout.view.interfaces
 
-import be.helmo.myscout.presenters.IMeetingRowView
+import be.helmo.myscout.presenters.interfaces.IMeetingRowView
 import com.google.android.gms.maps.model.LatLng
 
 interface IMeetingPresenter {

@@ -1,4 +1,4 @@
-package be.helmo.myscout.presenters
+package be.helmo.myscout.presenters.interfaces
 
 interface IMeetingRowView {
     fun setTitle(title: String?)

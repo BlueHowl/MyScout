@@ -1,9 +1,9 @@
 package be.helmo.myscout.factory.interfaces
 
-import be.helmo.myscout.model.Meeting
+import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
 
 interface ISelectMeetingCallback {
 
-    fun onSelectedMeeting(meeting: Meeting)
+    fun onSelectedMeeting(meeting: MeetingViewModel)
 
 }

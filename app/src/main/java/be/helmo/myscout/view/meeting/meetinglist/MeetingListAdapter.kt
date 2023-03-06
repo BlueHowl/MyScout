@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import be.helmo.myscout.R
-import be.helmo.myscout.presenters.IMeetingRowView
+import be.helmo.myscout.presenters.interfaces.IMeetingRowView
 import be.helmo.myscout.view.interfaces.IMeetingRecyclerCallbackPresenter
 
 class MeetingListAdapter(meetingListPresenter: IMeetingRecyclerCallbackPresenter) : RecyclerView.Adapter<MeetingListAdapter.MeetingViewHolder?>() {

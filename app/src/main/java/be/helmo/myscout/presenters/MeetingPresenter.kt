@@ -6,9 +6,11 @@ import be.helmo.myscout.database.repository.MyScoutRepository
 import be.helmo.myscout.factory.interfaces.IMeetingRecyclerCallback
 import be.helmo.myscout.factory.interfaces.ISelectMeetingCallback
 import be.helmo.myscout.model.Meeting
+import be.helmo.myscout.presenters.interfaces.IMeetingRowView
+import be.helmo.myscout.presenters.viewmodel.MeetingListViewModel
 import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
 import be.helmo.myscout.view.interfaces.IMeetingRecyclerCallbackPresenter
-import be.helmo.myscout.view.interfaces.IMeetingSelectPhaseCallback
+import be.helmo.myscout.view.interfaces.IMeetingsSelectMeetingCallback
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.take
@@ -20,9 +22,9 @@ import java.util.*
 
 
 class MeetingPresenter(var myScoutRepository: MyScoutRepository
-) : IMeetingRecyclerCallbackPresenter, IMeetingSelectPhaseCallback, LifecycleService() {
+) : IMeetingRecyclerCallbackPresenter, IMeetingsSelectMeetingCallback, LifecycleService() {
     var meetingList: ArrayList<Meeting> = ArrayList<Meeting>() //liste meetings
-    var meetingViewModels: ArrayList<MeetingViewModel> = ArrayList<MeetingViewModel>() //list meetings ViewModels
+    var meetingViewModels: ArrayList<MeetingListViewModel> = ArrayList<MeetingListViewModel>() //list meetings ViewModels
 
     var recylcerCallback: IMeetingRecyclerCallback? = null
     var selectsMeetingCallback: ISelectMeetingCallback? = null
@@ -34,7 +36,7 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
                         val date = SimpleDateFormat("dd/MM/yyyy").format(meeting!!.startDate)
                         meetingList.add(meeting)
                         meetingViewModels.add(
-                            MeetingViewModel(
+                            MeetingListViewModel(
                                 date,
                                 getAddressString(meeting.startLocation)
                             )
@@ -68,7 +70,7 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
         meetingList.add(meet)
         //add to recylclerview
         GlobalScope.launch {
-            meetingViewModels.add(MeetingViewModel(startDateHour, getAddressString(startLocation)))
+            meetingViewModels.add(MeetingListViewModel(startDateHour, getAddressString(startLocation)))
             recylcerCallback?.onMeetingDataAdd(meetingViewModels.size)
         }
     }
@@ -76,11 +78,27 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
     override fun removeMeeting(swipedItemPosition: Int) {
         myScoutRepository.deleteMeeting(meetingList[swipedItemPosition])
         meetingList.removeAt(swipedItemPosition)
-        meetingViewModels.removeAt(swipedItemPosition) //todo déjà remove ou pas ?
+        meetingViewModels.removeAt(swipedItemPosition)
     }
 
     override fun goToMeeting(position: Int) {
-        selectsMeetingCallback?.onSelectedMeeting(meetingList[position])
+        val meeting = meetingList[position]
+        val startdate = SimpleDateFormat("dd/MM/yyyy hh:mm").format(meeting.startDate)
+        val enddate = SimpleDateFormat("dd/MM/yyyy hh:mm").format(meeting.endDate)
+
+        GlobalScope.launch {
+            selectsMeetingCallback?.onSelectedMeeting(
+                MeetingViewModel(
+                    meeting.id,
+                    startdate,
+                    enddate,
+                    getAddressString(meeting.startLocation),
+                    getAddressString(meeting.endLocation),
+                    meeting.description,
+                    meeting.story
+                )
+            )
+        }
     }
 
     override fun setMeetingListCallback(iMeetingListCallback: IMeetingRecyclerCallback?) {

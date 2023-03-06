@@ -13,22 +13,27 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
-import be.helmo.myscout.presenters.PhaseFragmentInterface
+import be.helmo.myscout.model.Phase
+import be.helmo.myscout.presenters.interfaces.IEditPhaseFragment
 import be.helmo.myscout.view.interfaces.IPhasePresenter
 import java.io.ByteArrayOutputStream
-import java.util.*
+import kotlin.collections.ArrayList
 
 
-class EditPhaseFragment : Fragment(), PhaseFragmentInterface {
+class EditPhaseFragment : Fragment(), IEditPhaseFragment {
     lateinit var phasePresenter: IPhasePresenter
 
-    private var images: ArrayList<Uri?>? = null
+    var phase: Phase? = null
+    var editMode: Boolean = false
 
-    private var position = 0
+    var images: ArrayList<Uri?>? = ArrayList()
+
+    var position = 0
 
     val pickImageCode = 0
-    var duringText: EditText? = null
-    var resumeText: EditText? = null
+
+    lateinit var duringText: EditText
+    lateinit var resumeText: EditText
     lateinit var phasePrevPhotosBtn: Button
     lateinit var phaseNextPhotosBtn: Button
     lateinit var phaseAddPhotosBtn: Button
@@ -40,14 +45,14 @@ class EditPhaseFragment : Fragment(), PhaseFragmentInterface {
         super.onCreate(savedInstanceState)
 
         phasePresenter = PresenterSingletonFactory.instance!!.getPhasePresenter()
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_edit_phase, container, false)
 
         // link des composants
-        images = ArrayList()
-        duringText = view.findViewById(R.id.phase_during)
+        duringText = view.findViewById(R.id.phase_duration)
         resumeText = view.findViewById(R.id.phase_resume)
         phasePrevPhotosBtn = view.findViewById(R.id.phase_previous_photo_btn)
         phaseNextPhotosBtn = view.findViewById(R.id.phase_next_photo_btn)
@@ -77,13 +82,14 @@ class EditPhaseFragment : Fragment(), PhaseFragmentInterface {
         }
 
         phaseValidateBtn.setOnClickListener() {
-            if(duringText?.text.toString().isEmpty() || resumeText?.text.toString().isEmpty())
+            if(duringText.text.toString().isEmpty() || resumeText.text.toString().isEmpty())
                 Toast.makeText(context, "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show()
             else{
                 phasePresenter.addPhase(
-                    duringText?.text.toString(),
-                    resumeText?.text.toString(),
-                    images.toString()
+                    "null",
+                    duringText.text.toString(),
+                    resumeText.text.toString(),
+                    "directorypath"
                 )
                 activity?.onBackPressed() //todo changer?
             }
@@ -130,7 +136,20 @@ class EditPhaseFragment : Fragment(), PhaseFragmentInterface {
         menuTitle.text = getString(R.string.app_phase_edit_title)
     }
 
-    private fun pickImagesIntent() {
+    override fun setPhaseValues(phase: Phase, images: ArrayList<Uri>?) {
+        this.phase = phase
+
+        if(images != null) {
+            editMode = true
+
+            view?.findViewById<TextView>(R.id.et_phase_name)?.text = phase.name
+            view?.findViewById<TextView>(R.id.phase_duration)?.text = phase.duration.toString()
+            view?.findViewById<TextView>(R.id.phase_resume)?.text = phase.description
+            this.images?.addAll(images)
+        }
+    }
+
+    fun pickImagesIntent() {
         val intent = Intent()
         intent.type = "image/*"
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
@@ -185,7 +204,7 @@ class EditPhaseFragment : Fragment(), PhaseFragmentInterface {
         val bytes = ByteArrayOutputStream()
         inImage?.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
 
-        return phasePresenter.saveImage(inImage!!)
+        return phasePresenter.saveImage(inImage!!, phase!!.id)
     }
 
     fun compressUri(c: Context?, uri: Uri?): Uri {
@@ -198,9 +217,8 @@ class EditPhaseFragment : Fragment(), PhaseFragmentInterface {
     }
 
     companion object {
-        //private const val TAG = "PhaseFragment"
+        const val TAG = "EditPhaseFragment"
         fun newInstance(): EditPhaseFragment {
-
             return EditPhaseFragment()
         }
     }

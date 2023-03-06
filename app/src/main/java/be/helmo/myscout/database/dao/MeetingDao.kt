@@ -2,13 +2,20 @@ package be.helmo.myscout.database.dao
 
 import androidx.room.*
 import be.helmo.myscout.model.Meeting
+import be.helmo.myscout.model.Phase
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 @Dao
 interface MeetingDao {
+
     @get:Query("SELECT * FROM Meeting")
     val meetings: Flow<List<Meeting?>?>?
+
+    @Query("SELECT id, description, story, startDate, endDate, startLocation, endLocation FROM Meeting " +
+            "WHERE id = (:uuid)")
+    fun getMeeting(uuid: UUID?): Flow<Meeting?>?
 
     @Insert
     fun insert(meeting: Meeting?)

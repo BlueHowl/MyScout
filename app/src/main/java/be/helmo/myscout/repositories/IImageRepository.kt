@@ -7,6 +7,6 @@ interface IImageRepository {
 
     fun createDirectoryAndSaveImage(imageToSave: Bitmap, directoryName: String) : Uri
 
-    fun getImages(imagesDirectory: String): List<Bitmap>
+    fun getImages(imagesDirectory: String): ArrayList<Uri>
 
 }

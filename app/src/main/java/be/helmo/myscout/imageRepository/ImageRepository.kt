@@ -1,12 +1,8 @@
 package be.helmo.myscout.imageRepository
 
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
-import android.os.Environment
-import android.provider.MediaStore
-import android.util.Log
+import android.widget.Toast
 import androidx.core.net.toUri
 import be.helmo.myscout.MainActivity
 import be.helmo.myscout.repositories.IImageRepository
@@ -30,37 +26,21 @@ class ImageRepository : IImageRepository{
             out.flush()
             out.close()
         } catch (e: Exception) {
-            Log.e("imageRepo", "erreur enregistrement " + e.message)
-            //todo toast ? e.printStackTrace()
+            Toast.makeText(MainActivity.appContext, "Erreur lors de l'enregistrement de la photo", Toast.LENGTH_LONG).show()
         }
 
         return file.toUri()
     }
 
-    override fun getImages(imagesDirectory: String): List<Bitmap> {
-        val bitmaps: ArrayList<Bitmap> = ArrayList<Bitmap>()
+    override fun getImages(imagesDirectory: String): ArrayList<Uri> {
+        val images: ArrayList<Uri> = ArrayList()
         val dir = File(imagesDirectory)
         val files = dir.listFiles()
         files?.forEach {
-            bitmaps.add(
-                when {
-                    Build.VERSION.SDK_INT < 28 -> MediaStore.Images.Media.getBitmap(
-                        MainActivity.appContext.contentResolver,
-                        it.toUri()
-                    )
-                    else -> {
-                        val source =
-                            ImageDecoder.createSource(
-                                MainActivity.appContext.contentResolver,
-                                it.toUri()
-                            )
-                        ImageDecoder.decodeBitmap(source)
-                    }
-                }
-            )
+            images.add(it.toUri())
         }
 
-        return bitmaps
+        return images
     }
 
 }

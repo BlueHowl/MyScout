@@ -5,6 +5,7 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
 import android.text.format.DateFormat
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,26 +18,24 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
+import be.helmo.myscout.presenters.interfaces.ISetMeetingInfos
+import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
 import be.helmo.myscout.view.interfaces.IMeetingRecyclerCallbackPresenter
-import be.helmo.myscout.view.meeting.meetinglist.MeetingListFragment
 
 import com.adevinta.leku.*
 import com.google.android.gms.maps.model.LatLng
 import java.util.*
 
-const val ARG_PARAM_PRESENTER = "presenter"
-const val ARG_PARAM_MEETID = "id"
-const val ARG_PARAM_EDITMODE = "mode"
 
 /**
  * A simple [Fragment] subclass.
  * create an instance of this fragment.
  */
 class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
-    TimePickerDialog.OnTimeSetListener {
+    TimePickerDialog.OnTimeSetListener, ISetMeetingInfos {
     lateinit var meetingPresenter: IMeetingRecyclerCallbackPresenter
 
-    var meetId: UUID? = null
+    var meeting: MeetingViewModel? = null
     var editMode: Boolean = false
 
     var dateField: Int = 0
@@ -53,16 +52,15 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     lateinit var btnEndDateHour: Button
     lateinit var btnStartLocation: Button
     lateinit var btnEndLocation: Button
+    lateinit var etDescription: EditText
+    lateinit var etStory: EditText
+
+    lateinit var btnAdd: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         meetingPresenter = PresenterSingletonFactory.instance!!.getMeetingPresenter()
-
-        arguments?.let {
-            meetId = it.getSerializable(ARG_PARAM_MEETID) as UUID?
-            editMode = it.getBoolean(ARG_PARAM_EDITMODE)
-        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -84,8 +82,11 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         btnEndLocation.setOnClickListener(::onEndLocationClick)
 
         //editTexts
-        val etDescription = view.findViewById<EditText>(R.id.etDescription)
-        val etStory = view.findViewById<EditText>(R.id.etStory)
+        etDescription = view.findViewById(R.id.etDescription)
+        etStory = view.findViewById(R.id.etStory)
+
+        //call après l'assignation des objets de la vue
+        applyMeetingValues()
 
         //bottombtns
         val btnCancel = view.findViewById<Button>(R.id.cancel)
@@ -93,24 +94,27 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             activity?.onBackPressed() //todo changer?
         }
 
-        val btnAdd = view.findViewById<Button>(R.id.add)
+        btnAdd = view.findViewById(R.id.add)
         btnAdd.setOnClickListener {
             if(startDateHour != null && endDateHour != null && startLocation != null &&
                 endLocation != null) { //&& etDescription.text.isNotEmpty() && etStory.text.isNotEmpty()) {
-                meetingPresenter.addMeeting(
-                    startDateHour!!,
-                    endDateHour!!,
-                    startLocation!!,
-                    endLocation!!,
-                    etDescription.text.toString(),
-                    etStory.text.toString()
-                )
-                Log.d("addMeeting", "appel addMeeting")
+                if(editMode) {
+                    //todo meetingPresenter.modifyMeeting()
+                } else {
+                    meetingPresenter.addMeeting(
+                        startDateHour!!,
+                        endDateHour!!,
+                        startLocation!!,
+                        endLocation!!,
+                        etDescription.text.toString(),
+                        etStory.text.toString()
+                    )
+                    Toast.makeText(context, "Réunion ajoutée", Toast.LENGTH_LONG).show()
+                }
 
                 activity?.onBackPressed() //todo changer?
             } else {
-                Log.d("addMeeting", "champs non remplis")
-                //todo toast
+                Toast.makeText(context, "Champs non remplis", Toast.LENGTH_LONG).show()
             }
         }
 
@@ -161,6 +165,31 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         //rend invisible le btn add_element
         val addElement = requireActivity().findViewById<ImageView>(R.id.add_element)
         addElement.visibility = View.GONE
+
+        //rend le btn edit_element invisible
+        val editElement = requireActivity().findViewById<ImageView>(R.id.edit_element)
+        editElement.visibility = View.INVISIBLE
+    }
+
+    override fun setMeetingValues(meeting: MeetingViewModel?) {
+        this.meeting = meeting
+        Log.d("test2", meeting.toString())
+        if(meeting != null) {
+            editMode = true //todo utile ?
+
+            btnAdd.setText(R.string.btn_modify)
+        }
+    }
+
+    fun applyMeetingValues() {
+        btnStartDateHour.text = meeting?.startDate
+        btnEndDateHour.text = meeting?.endDate
+
+        btnStartLocation.text = meeting?.startAddress
+        btnEndLocation.text = meeting?.endAddress
+
+        etDescription.setText(meeting?.description)
+        etStory.setText(meeting?.story)
     }
 
     //datehours
@@ -238,16 +267,9 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
 
     companion object {
-        private const val TAG = "EditMeetingFragment"
-        fun newInstance(arg1: UUID?, arg2: Boolean): EditMeetingFragment {
-            val fragment = EditMeetingFragment()
-
-            val args = Bundle()
-            args.putSerializable(ARG_PARAM_MEETID, arg1)
-            args.putBoolean(ARG_PARAM_EDITMODE, arg2)
-            fragment.arguments = args
-
-            return fragment
+        const val TAG = "EditMeetingFragment"
+        fun newInstance(): EditMeetingFragment {
+            return EditMeetingFragment()
         }
     }
 

@@ -8,15 +8,14 @@ import androidx.recyclerview.widget.RecyclerView
 import be.helmo.myscout.R
 import be.helmo.myscout.databinding.PhaseListItemBinding
 import be.helmo.myscout.model.Phase
-import be.helmo.myscout.view.phases.phaselist.PhaseListFragment.ISelectPhase
 
-class PhaseAdapter(private val phases: List<Phase>, private val callBacks: ISelectPhase) :
-    RecyclerView.Adapter<PhaseAdapter.ViewHolder>() {
+class PhaseListAdapter(val phases: List<Phase>) :
+    RecyclerView.Adapter<PhaseListAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val dataBinding: PhaseListItemBinding = DataBindingUtil.inflate(layoutInflater, R.layout.phase_list_item, parent, false)
+        val dataBinding: PhaseListItemBinding = DataBindingUtil.inflate(layoutInflater, R.layout.phase_list_item, parent, false) //remove
 
-        return ViewHolder(dataBinding, callBacks)
+        return ViewHolder(dataBinding, 0)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -27,16 +26,14 @@ class PhaseAdapter(private val phases: List<Phase>, private val callBacks: ISele
         return phases.size
     }
 
-    inner class ViewHolder(viewDataBinding: PhaseListItemBinding, callBacks: ISelectPhase) :
+    inner class ViewHolder(viewDataBinding: PhaseListItemBinding, position: Int) :
         RecyclerView.ViewHolder(viewDataBinding.root), View.OnClickListener {
-        private val viewDataBinding: PhaseListItemBinding
-        private val callBacks: ISelectPhase
+        val viewDataBinding: PhaseListItemBinding
+
         var mItem: Phase? = null
 
         init {
             this.viewDataBinding = viewDataBinding
-            this.callBacks = callBacks
-            viewDataBinding.root.setOnClickListener(this)
         }
 
         override fun toString(): String {
@@ -50,7 +47,7 @@ class PhaseAdapter(private val phases: List<Phase>, private val callBacks: ISele
         }
 
         override fun onClick(view: View) {
-            callBacks.onSelectedPhase(mItem!!.id)
+            //callBacks.onSelectedPhase(mItem!!.id)
         }
     }
 }

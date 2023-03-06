@@ -2,7 +2,7 @@ package be.helmo.myscout.view.interfaces
 
 import be.helmo.myscout.factory.interfaces.ISelectMeetingCallback
 
-interface IMeetingSelectPhaseCallback {
+interface IMeetingsSelectMeetingCallback {
 
     fun setSelectMeetingCallback(iSelectMeetingCallback: ISelectMeetingCallback?)
 

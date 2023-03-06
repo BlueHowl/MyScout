@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import be.helmo.myscout.MainActivity
 import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
 import be.helmo.myscout.factory.interfaces.IMeetingRecyclerCallback
@@ -24,11 +23,6 @@ import kotlin.math.absoluteValue
 class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
     var recyclerView: RecyclerView? = null
     lateinit var meetingPresenter: IMeetingRecyclerCallbackPresenter
-
-    /*
-    interface ISelectPhase {
-        fun onSelectedPhase(placeId: UUID?)
-    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -129,6 +123,10 @@ class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
         //rend le btn add_element visible
         val addElement = requireActivity().findViewById<ImageView>(R.id.add_element)
         addElement.visibility = View.VISIBLE
+
+        //rend le btn edit_element invisible
+        val editElement = requireActivity().findViewById<ImageView>(R.id.edit_element)
+        editElement.visibility = View.INVISIBLE
     }
 
     override fun onAttach(context: Context) {

@@ -1,6 +1,6 @@
 package be.helmo.myscout.presenters.viewmodel
 
-class PhaseViewModel(
+class PhaseListViewModel(
     val s: String?,
     val duration: String?,
     val description: String?) {

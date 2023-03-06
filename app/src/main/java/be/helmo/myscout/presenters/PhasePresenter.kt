@@ -6,18 +6,20 @@ import be.helmo.myscout.database.repository.MyScoutRepository
 import be.helmo.myscout.factory.interfaces.IPhaseRecyclerCallback
 import be.helmo.myscout.factory.interfaces.ISelectPhaseCallback
 import be.helmo.myscout.model.Phase
-import be.helmo.myscout.presenters.viewmodel.PhaseViewModel
+import be.helmo.myscout.presenters.interfaces.IPhaseRowView
+import be.helmo.myscout.presenters.viewmodel.PhaseListViewModel
 import be.helmo.myscout.repositories.IImageRepository
 import be.helmo.myscout.view.interfaces.IPhaseRecyclerCallbackPresenter
+import be.helmo.myscout.view.interfaces.IPhasesSelectPhaseCallback
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageRepository: IImageRepository) : IPhaseRecyclerCallbackPresenter {
-    var phaseList: ArrayList<Phase> = ArrayList<Phase>() //liste meetings
-    var phaseViewModels: ArrayList<PhaseViewModel> = ArrayList<PhaseViewModel>() //list meetings ViewModels
+class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageRepository: IImageRepository) : IPhaseRecyclerCallbackPresenter, IPhasesSelectPhaseCallback {
+    var phaseList: ArrayList<Phase> = ArrayList() //liste phase
+    var phaseViewModels: ArrayList<PhaseListViewModel> = ArrayList() //list phase ViewModels
 
     var recylcerCallback: IPhaseRecyclerCallback? = null
     var selectsPhaseCallback: ISelectPhaseCallback? = null
@@ -32,7 +34,7 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
                 for (i in 0 until phases?.size!!) {
                     phases[i]?.let { phaseList.add(it) }
                         phaseViewModels.add(
-                            PhaseViewModel(
+                            PhaseListViewModel(
                                 "Phase ${i + 1}",
                                 phases[i]?.duration.toString(),
                                 phases[i]?.description
@@ -52,8 +54,8 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
         return Date(time + durationTime)
     }
 
-    override fun saveImage(imageToSave: Bitmap) : Uri {
-        return imageRepository.createDirectoryAndSaveImage(imageToSave, "phase2565")
+    override fun saveImage(imageToSave: Bitmap, phaseId: UUID) : Uri {
+        return imageRepository.createDirectoryAndSaveImage(imageToSave, phaseId.toString())
     }
 
     override fun onBindPhaseRowViewAtPosition(position: Int, rowView: IPhaseRowView) {
@@ -67,7 +69,7 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
         TODO("Not yet implemented")
     }
 
-    override fun addPhase(during: String, description: String, images: String) {
+    override fun addPhase(name: String, duration: String, description: String, images: String) {
         TODO("Not yet implemented")
     }
 
@@ -76,8 +78,11 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
     }
 
     override fun goToPhase(position: Int) {
-        TODO("Not yet implemented")
+        selectsPhaseCallback?.onSelectedPhase(phaseList[position], imageRepository.getImages(phaseList[position].id.toString()))
     }
 
+    override fun setSelectPhaseCallback(iSelectPhaseCallback: ISelectPhaseCallback?) {
+        selectsPhaseCallback = iSelectPhaseCallback
+    }
 
 }
