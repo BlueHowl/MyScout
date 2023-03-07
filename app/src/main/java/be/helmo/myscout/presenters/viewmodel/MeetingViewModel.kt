@@ -1,5 +1,6 @@
 package be.helmo.myscout.presenters.viewmodel
 
+import com.google.android.gms.maps.model.LatLng
 import java.util.*
 
 data class MeetingViewModel(
@@ -8,6 +9,8 @@ data class MeetingViewModel(
     val endDate: String?,
     val startAddress: String?,
     val endAddress: String?,
+    val startLocation: LatLng?,
+    val endLocation: LatLng?,
     val description: String?,
     val story: String?
 )

@@ -24,7 +24,7 @@ import java.util.*
 class MeetingPresenter(var myScoutRepository: MyScoutRepository
 ) : IMeetingRecyclerCallbackPresenter, IMeetingsSelectMeetingCallback, LifecycleService() {
     var meetingList: ArrayList<Meeting> = ArrayList<Meeting>() //liste meetings
-    var meetingViewModels: ArrayList<MeetingListViewModel> = ArrayList<MeetingListViewModel>() //list meetings ViewModels
+    var meetingListViewModels: ArrayList<MeetingListViewModel> = ArrayList<MeetingListViewModel>() //list meetings ViewModels
 
     var recylcerCallback: IMeetingRecyclerCallback? = null
     var selectsMeetingCallback: ISelectMeetingCallback? = null
@@ -35,13 +35,13 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
                     for (meeting in meetings!!) {
                         val date = SimpleDateFormat("dd/MM/yyyy").format(meeting!!.startDate)
                         meetingList.add(meeting)
-                        meetingViewModels.add(
+                        meetingListViewModels.add(
                             MeetingListViewModel(
                                 date,
                                 getAddressString(meeting.startLocation)
                             )
                         )
-                        recylcerCallback?.onMeetingDataAdd(meetingViewModels.size)
+                        recylcerCallback?.onMeetingDataAdd(meetingListViewModels.size)
                     }
                 }
 
@@ -50,13 +50,13 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
     }
 
     override fun onBindMeetingRowViewAtPosition(position: Int, rowView: IMeetingRowView) {
-        val meeting = meetingViewModels[position]
+        val meeting = meetingListViewModels[position]
         rowView.setTitle(String.format("Réunion du %s", meeting.date))
         rowView.setAddress(meeting.address)
     }
 
     override fun getMeetingRowsCount() : Int {
-        return meetingViewModels.size
+        return meetingListViewModels.size
     }
 
     override fun addMeeting(startDateHour: String,
@@ -70,15 +70,42 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
         meetingList.add(meet)
         //add to recylclerview
         GlobalScope.launch {
-            meetingViewModels.add(MeetingListViewModel(startDateHour, getAddressString(startLocation)))
-            recylcerCallback?.onMeetingDataAdd(meetingViewModels.size)
+            meetingListViewModels.add(MeetingListViewModel(startDateHour, getAddressString(startLocation)))
+            recylcerCallback?.onMeetingDataAdd(meetingListViewModels.size)
+        }
+    }
+
+    override fun modifyMeeting(meetId: UUID,
+                               startDateHour: String,
+                               endDateHour: String,
+                               startLocation: LatLng,
+                               endLocation: LatLng,
+                               description: String,
+                               story: String) {
+
+        meetingList.forEachIndexed { index, meeting ->
+            if(meeting.id == meetId) {
+                meeting.description = description
+                meeting.story = story
+                meeting.startDate = Date(startDateHour)
+                meeting.endDate = Date(endDateHour)
+                meeting.startLocation = startLocation
+                meeting.endLocation = endLocation
+
+                myScoutRepository.updateMeeting(meeting)
+
+                GlobalScope.launch {
+                    meetingListViewModels[index].date = startDateHour.slice(IntRange(0, 9))
+                    meetingListViewModels[index].address = getAddressString(startLocation)
+                }
+            }
         }
     }
 
     override fun removeMeeting(swipedItemPosition: Int) {
         myScoutRepository.deleteMeeting(meetingList[swipedItemPosition])
         meetingList.removeAt(swipedItemPosition)
-        meetingViewModels.removeAt(swipedItemPosition)
+        meetingListViewModels.removeAt(swipedItemPosition)
     }
 
     override fun goToMeeting(position: Int) {
@@ -94,6 +121,8 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
                     enddate,
                     getAddressString(meeting.startLocation),
                     getAddressString(meeting.endLocation),
+                    meeting.startLocation,
+                    meeting.endLocation,
                     meeting.description,
                     meeting.story
                 )

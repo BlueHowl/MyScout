@@ -85,9 +85,6 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         etDescription = view.findViewById(R.id.etDescription)
         etStory = view.findViewById(R.id.etStory)
 
-        //call après l'assignation des objets de la vue
-        applyMeetingValues()
-
         //bottombtns
         val btnCancel = view.findViewById<Button>(R.id.cancel)
         btnCancel.setOnClickListener {
@@ -99,7 +96,16 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             if(startDateHour != null && endDateHour != null && startLocation != null &&
                 endLocation != null) { //&& etDescription.text.isNotEmpty() && etStory.text.isNotEmpty()) {
                 if(editMode) {
-                    //todo meetingPresenter.modifyMeeting()
+                    meetingPresenter.modifyMeeting(
+                        meeting!!.meetId,
+                        startDateHour!!,
+                        endDateHour!!,
+                        startLocation!!,
+                        endLocation!!,
+                        etDescription.text.toString(),
+                        etStory.text.toString())
+
+                    Toast.makeText(context, "Réunion modifiée", Toast.LENGTH_LONG).show()
                 } else {
                     meetingPresenter.addMeeting(
                         startDateHour!!,
@@ -116,6 +122,11 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             } else {
                 Toast.makeText(context, "Champs non remplis", Toast.LENGTH_LONG).show()
             }
+        }
+
+        //call après l'assignation des objets de la vue
+        if(editMode) {
+            applyMeetingValues()
         }
 
         lekuActivityResultLauncher =
@@ -146,7 +157,7 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                     }
 
                 } else {
-                    Log.d("Location Picker result", "CANCELLED") //todo Toast
+                    Toast.makeText(context, "Erreur lors de la récupération de la localisation", Toast.LENGTH_LONG).show()
                 }
             }
 
@@ -173,11 +184,13 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
     override fun setMeetingValues(meeting: MeetingViewModel?) {
         this.meeting = meeting
-        Log.d("test2", meeting.toString())
         if(meeting != null) {
-            editMode = true //todo utile ?
+            editMode = true
 
-            btnAdd.setText(R.string.btn_modify)
+            startDateHour = meeting.startDate
+            endDateHour = meeting.endDate
+            startLocation = meeting.startLocation
+            endLocation = meeting.endLocation
         }
     }
 
@@ -190,6 +203,10 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
         etDescription.setText(meeting?.description)
         etStory.setText(meeting?.story)
+
+        //texte du bouton devient modifier car si appel de cette fonction
+        //alors on est dans le cas de modif
+        btnAdd.setText(R.string.btn_modify)
     }
 
     //datehours

@@ -132,8 +132,17 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
         super.onViewCreated(view, savedInstanceState)
         Log.d("PhaseFragment", "onViewCreated called")
 
+        //change le titre du menu
         val menuTitle = requireActivity().findViewById<TextView>(R.id.menu_title)
         menuTitle.text = getString(R.string.app_phase_edit_title)
+
+        //rend invisible le btn add_element
+        val addElement = requireActivity().findViewById<ImageView>(R.id.add_element)
+        addElement.visibility = View.GONE
+
+        //rend le btn edit_element invisible
+        val editElement = requireActivity().findViewById<ImageView>(R.id.edit_element)
+        editElement.visibility = View.INVISIBLE
     }
 
     override fun setPhaseValues(phase: Phase, images: ArrayList<Uri>?) {

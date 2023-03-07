@@ -10,7 +10,7 @@
     <string name="add_meeting">Ajouter une réunion</string>
 
     <string name="btn_add">Ajouter</string>
-    <string name="btn_modify">Modifier</string>
+    <string name="btn_modify">Valider</string>
     <string name="btn_cancel">Annuler</string>
 
     <string name="start_date_hour">Date et heure de début</string>

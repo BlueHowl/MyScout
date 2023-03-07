@@ -2,6 +2,7 @@ package be.helmo.myscout.view.interfaces
 
 import be.helmo.myscout.presenters.interfaces.IMeetingRowView
 import com.google.android.gms.maps.model.LatLng
+import java.util.*
 
 interface IMeetingPresenter {
 
@@ -15,6 +16,14 @@ interface IMeetingPresenter {
                    endLocation: LatLng,
                    description: String,
                    story: String)
+
+    fun modifyMeeting(meetId: UUID,
+                      startDateHour: String,
+                      endDateHour: String,
+                      startLocation: LatLng,
+                      endLocation: LatLng,
+                      description: String,
+                      story: String)
 
     fun removeMeeting(swipedItemPosition: Int)
 
