@@ -13,7 +13,7 @@ interface MeetingDao {
     @get:Query("SELECT * FROM Meeting ORDER BY startDate")
     val meetings: Flow<List<Meeting?>?>?
 
-    @Query("SELECT id, description, story, startDate, endDate, startLocation, endLocation FROM Meeting " +
+    @Query("SELECT id, description, story, startDate, endDate, startLocation, endLocation, rating FROM Meeting " +
             "WHERE id = (:uuid)")
     fun getMeeting(uuid: UUID?): Flow<Meeting?>?
 

@@ -25,6 +25,8 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
     var meetingList: ArrayList<Meeting> = ArrayList<Meeting>() //liste meetings
     var meetingListViewModels: ArrayList<MeetingListViewModel> = ArrayList<MeetingListViewModel>() //list meetings ViewModels
 
+    var currentMeetingViewModel: MeetingViewModel? = null
+
     var recylcerCallback: IMeetingRecyclerCallback? = null
     var selectsMeetingCallback: ISelectMeetingCallback? = null
 
@@ -66,7 +68,7 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
                    endLocation: LatLng,
                    description: String,
                    story: String) {
-        val meet = Meeting(UUID.randomUUID(), description, story, Date(startDateHour), Date(endDateHour), startLocation, endLocation) //todo changer conversion dates
+        val meet = Meeting(UUID.randomUUID(), description, story, Date(startDateHour), Date(endDateHour), startLocation, endLocation, null) //todo changer conversion dates
         myScoutRepository.insertMeeting(meet)
         meetingList.add(meet)
         //add to recylclerview
@@ -82,7 +84,8 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
                                startLocation: LatLng,
                                endLocation: LatLng,
                                description: String,
-                               story: String) {
+                               story: String,
+                               rating: Float) {
 
         meetingList.forEachIndexed { index, meeting ->
             if(meeting.id == meetId) {
@@ -92,10 +95,23 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
                 meeting.endDate = Date(endDateHour)
                 meeting.startLocation = startLocation
                 meeting.endLocation = endLocation
+                meeting.rating = rating
 
                 myScoutRepository.updateMeeting(meeting)
 
                 GlobalScope.launch {
+                    //met a jour le viewModel courant
+                    currentMeetingViewModel?.startDate = startDateHour
+                    currentMeetingViewModel?.endDate = endDateHour
+                    currentMeetingViewModel?.startAddress = getAddressString(meeting.startLocation)
+                    currentMeetingViewModel?.endAddress = getAddressString(meeting.endLocation)
+                    currentMeetingViewModel?.startLocation = meeting.endLocation
+                    currentMeetingViewModel?.endLocation = meeting.endLocation
+                    currentMeetingViewModel?.description = meeting.description
+                    currentMeetingViewModel?.story = meeting.story
+                    currentMeetingViewModel?.rating = meeting.rating
+
+                    //met à jour le viewModel dans la liste
                     meetingListViewModels[index].date = startDateHour.slice(IntRange(0, 9))
                     meetingListViewModels[index].address = getAddressString(startLocation)
                 }
@@ -122,19 +138,19 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
         val enddate = SimpleDateFormat("dd/MM/yyyy hh:mm").format(meeting.endDate)
 
         GlobalScope.launch {
-            selectsMeetingCallback?.onSelectedMeeting(
-                MeetingViewModel(
-                    meeting.id,
-                    startdate,
-                    enddate,
-                    getAddressString(meeting.startLocation),
-                    getAddressString(meeting.endLocation),
-                    meeting.startLocation,
-                    meeting.endLocation,
-                    meeting.description,
-                    meeting.story
-                )
+            currentMeetingViewModel = MeetingViewModel(
+                meeting.id,
+                startdate,
+                enddate,
+                getAddressString(meeting.startLocation),
+                getAddressString(meeting.endLocation),
+                meeting.startLocation,
+                meeting.endLocation,
+                meeting.description,
+                meeting.story,
+                meeting.rating
             )
+            selectsMeetingCallback?.onSelectedMeeting(currentMeetingViewModel!!)
         }
     }
 

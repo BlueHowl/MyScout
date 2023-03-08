@@ -23,7 +23,8 @@ interface IMeetingPresenter : IMeetingRecyclerCallbackPresenter {
                       startLocation: LatLng,
                       endLocation: LatLng,
                       description: String,
-                      story: String)
+                      story: String,
+                      rating: Float)
 
     fun removeMeeting(swipedItemPosition: Int?)
 

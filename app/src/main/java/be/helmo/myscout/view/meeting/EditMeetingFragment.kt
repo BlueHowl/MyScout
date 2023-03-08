@@ -58,6 +58,8 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
     lateinit var btnAdd: Button
 
+    lateinit var ratingBar: RatingBar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -86,6 +88,8 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         etDescription = view.findViewById(R.id.etDescription)
         etStory = view.findViewById(R.id.etStory)
 
+        ratingBar = view.findViewById(R.id.ratingBar)
+
         //bottombtns
         val btnCancel = view.findViewById<Button>(R.id.cancel)
         btnCancel.setOnClickListener {
@@ -104,9 +108,10 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                         startLocation!!,
                         endLocation!!,
                         etDescription.text.toString(),
-                        etStory.text.toString())
+                        etStory.text.toString(),
+                        ratingBar.rating)
 
-                    Toast.makeText(context, "Réunion modifiée", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Réunion modifiée", Toast.LENGTH_SHORT).show()
                 } else {
                     meetingPresenter.addMeeting(
                         startDateHour!!,
@@ -116,7 +121,7 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                         etDescription.text.toString(),
                         etStory.text.toString()
                     )
-                    Toast.makeText(context, "Réunion ajoutée", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Réunion ajoutée", Toast.LENGTH_SHORT).show()
                 }
 
                 activity?.onBackPressed() //todo changer?
@@ -214,6 +219,11 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         //texte du bouton devient modifier car si appel de cette fonction
         //alors on est dans le cas de modif
         btnAdd.setText(R.string.btn_modify)
+
+        ratingBar.visibility = View.VISIBLE
+        if(meeting?.rating != null) {
+            ratingBar.rating = meeting?.rating!!
+        }
     }
 
     //datehours
