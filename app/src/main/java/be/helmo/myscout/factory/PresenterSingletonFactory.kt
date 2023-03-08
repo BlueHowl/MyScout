@@ -40,6 +40,10 @@ class PresenterSingletonFactory() {
         return phasePresenter
     }
 
+    fun getRecyclerCallbackPhasePresenter(): IPhaseRecyclerCallbackPresenter {
+        return phasePresenter
+    }
+
     companion object {
         var instance: PresenterSingletonFactory? = null
             get() {

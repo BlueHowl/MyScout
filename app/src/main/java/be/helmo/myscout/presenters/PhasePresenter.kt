@@ -54,6 +54,10 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
         return Date(time + durationTime)
     }
 
+    override fun setPhaseListCallback(iPhaseListCallback: IPhaseRecyclerCallback?) {
+        recyclerCallback = iPhaseListCallback
+    }
+
     override fun saveImage(imageToSave: Bitmap, phaseId: UUID) : Uri {
         return imageRepository.createDirectoryAndSaveImage(imageToSave, phaseId.toString())
     }

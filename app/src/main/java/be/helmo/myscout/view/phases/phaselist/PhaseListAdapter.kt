@@ -3,51 +3,60 @@ package be.helmo.myscout.view.phases.phaselist
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import be.helmo.myscout.R
 import be.helmo.myscout.databinding.PhaseListItemBinding
 import be.helmo.myscout.model.Phase
+import be.helmo.myscout.presenters.interfaces.IPhaseRowView
+import be.helmo.myscout.view.interfaces.IPhaseRecyclerCallbackPresenter
 
-class PhaseListAdapter(val phases: List<Phase>) :
-    RecyclerView.Adapter<PhaseListAdapter.ViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val dataBinding: PhaseListItemBinding = DataBindingUtil.inflate(layoutInflater, R.layout.phase_list_item, parent, false) //remove
+class PhaseListAdapter(phaseListPresenter: IPhaseRecyclerCallbackPresenter) : RecyclerView.Adapter<PhaseListAdapter.PhaseViewHolder>() {
+    private var presenter: IPhaseRecyclerCallbackPresenter? = phaseListPresenter
 
-        return ViewHolder(dataBinding, 0)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhaseViewHolder {
+        return PhaseViewHolder(
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.phase_list_item, parent, false)
+        )
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(phases[position])
+    override fun onBindViewHolder(holder: PhaseViewHolder, position: Int) {
+        presenter!!.onBindPhaseRowViewAtPosition(position, holder)
+
+        holder.itemView.setOnClickListener {
+            presenter!!.goToPhase(position);
+        }
     }
 
     override fun getItemCount(): Int {
-        return phases.size
+        return presenter!!.getPhaseRowsCount()
     }
 
-    inner class ViewHolder(viewDataBinding: PhaseListItemBinding, position: Int) :
-        RecyclerView.ViewHolder(viewDataBinding.root), View.OnClickListener {
-        val viewDataBinding: PhaseListItemBinding
+    inner class PhaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+        IPhaseRowView {
 
-        var mItem: Phase? = null
+        private var titleTextView: TextView
+        private var durationTextView: TextView
+        private var descriptionTextView: TextView
 
         init {
-            this.viewDataBinding = viewDataBinding
+            titleTextView = itemView.findViewById(R.id.t_phase_name)
+            durationTextView = itemView.findViewById(R.id.t_phase_duration)
+            descriptionTextView = itemView.findViewById(R.id.t_phase_resume)
         }
 
-        override fun toString(): String {
-            return super.toString() + " '" + mItem!!.description + "'"
+        override fun setTitle(title: String?) {
+            titleTextView.text = title
         }
 
-        fun bind(phase: Phase?) {
-            mItem = phase
-            viewDataBinding.viewModel = mItem
-            viewDataBinding.executePendingBindings()
+        override fun setDuration(duration: String?) {
+            durationTextView.text = duration
         }
 
-        override fun onClick(view: View) {
-            //callBacks.onSelectedPhase(mItem!!.id)
+        override fun setDescription(description: String?) {
+            descriptionTextView.text = description
         }
     }
 }

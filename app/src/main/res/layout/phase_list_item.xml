@@ -12,7 +12,7 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/phase_name"
+            android:id="@+id/t_phase_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="24sp"
@@ -22,12 +22,22 @@
             tools:text="Phase Name" />
 
         <TextView
-            android:id="@+id/phase_date"
+                android:id="@+id/t_phase_duration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/t_phase_name"
+                tools:text="03/02/2021"/>
+
+        <TextView
+            android:id="@+id/t_phase_resume"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/phase_name"
+            app:layout_constraintTop_toBottomOf="@id/t_phase_duration"
             tools:text="03/02/2021"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

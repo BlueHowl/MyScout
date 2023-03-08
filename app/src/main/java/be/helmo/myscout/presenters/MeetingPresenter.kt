@@ -26,7 +26,7 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
     var meetingList: ArrayList<Meeting> = ArrayList<Meeting>() //liste meetings
     var meetingListViewModels: ArrayList<MeetingListViewModel> = ArrayList<MeetingListViewModel>() //list meetings ViewModels
 
-    var recylcerCallback: IMeetingRecyclerCallback? = null
+    var recyclerCallback: IMeetingRecyclerCallback? = null
     var selectsMeetingCallback: ISelectMeetingCallback? = null
 
     init {
@@ -41,7 +41,7 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
                                 getAddressString(meeting.startLocation)
                             )
                         )
-                        recylcerCallback?.onMeetingDataAdd(meetingListViewModels.size)
+                        recyclerCallback?.onMeetingDataAdd(meetingListViewModels.size)
                     }
                 }
 
@@ -71,7 +71,7 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
         //add to recylclerview
         GlobalScope.launch {
             meetingListViewModels.add(MeetingListViewModel(startDateHour, getAddressString(startLocation)))
-            recylcerCallback?.onMeetingDataAdd(meetingListViewModels.size)
+            recyclerCallback?.onMeetingDataAdd(meetingListViewModels.size)
         }
     }
 
@@ -131,7 +131,7 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
     }
 
     override fun setMeetingListCallback(iMeetingListCallback: IMeetingRecyclerCallback?) {
-        recylcerCallback = iMeetingListCallback
+        recyclerCallback = iMeetingListCallback
     }
 
     override fun setSelectMeetingCallback(iSelectMeetingCallback: ISelectMeetingCallback?) {
