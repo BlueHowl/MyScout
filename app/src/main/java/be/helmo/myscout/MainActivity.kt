@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
             val fragment = EditPhaseFragment.newInstance()
             val fragmentManager: FragmentManager = supportFragmentManager
             val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
-            fragment.setPhaseValues(Phase(UUID.randomUUID(), "", "", 0L, "", false), null)
+            fragment.setPhaseValues(Phase(UUID.randomUUID(), "", "", 0L, "",false), null)
 
             fragmentTransaction.replace(R.id.fragment_container, fragment)
             fragmentTransaction.addToBackStack(null)

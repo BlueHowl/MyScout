@@ -36,4 +36,5 @@
     <string name="phase_pick_photos">ajouter</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="phase_name_edit_title">Entrer le nom</string>
 </resources>

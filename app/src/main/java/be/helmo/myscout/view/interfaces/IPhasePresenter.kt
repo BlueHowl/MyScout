@@ -14,10 +14,12 @@ interface IPhasePresenter {
     fun getPhaseRowsCount() : Int
 
     fun addPhase(name: String,
-                 duration: String,
-                 description: String,
-                 images: String)
-
+                 duration: Long,
+                 description: String)
+    fun modifyPhase(uuid: UUID,
+                    name: String,
+                    resume: String,
+                    duration: Long)
     fun removePhase(swipeItemPosition: Int)
 
     fun goToPhase(position: Int)

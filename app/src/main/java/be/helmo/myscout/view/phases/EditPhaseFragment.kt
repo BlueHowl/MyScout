@@ -32,6 +32,7 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
 
     val pickImageCode = 0
 
+    lateinit var nameText: EditText
     lateinit var duringText: EditText
     lateinit var resumeText: EditText
     lateinit var phasePrevPhotosBtn: Button
@@ -52,6 +53,7 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
         val view = inflater.inflate(R.layout.fragment_edit_phase, container, false)
 
         // link des composants
+        nameText = view.findViewById(R.id.et_phase_name)
         duringText = view.findViewById(R.id.phase_duration)
         resumeText = view.findViewById(R.id.phase_resume)
         phasePrevPhotosBtn = view.findViewById(R.id.phase_previous_photo_btn)
@@ -85,12 +87,15 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
             if(duringText.text.toString().isEmpty() || resumeText.text.toString().isEmpty())
                 Toast.makeText(context, "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show()
             else{
-                phasePresenter.addPhase(
-                    "null",
-                    duringText.text.toString(),
-                    resumeText.text.toString(),
-                    "directorypath"
-                )
+                if(editMode){
+                    phasePresenter.modifyPhase(phase!!.id, nameText.text.toString(), resumeText.text.toString(), duringText.text.toString().toLong())
+                }else{
+                    phasePresenter.addPhase(
+                        nameText.text.toString(),
+                        duringText.text.toString().toLong(),
+                        resumeText.text.toString()
+                    )
+                }
                 activity?.onBackPressed() //todo changer?
             }
         }

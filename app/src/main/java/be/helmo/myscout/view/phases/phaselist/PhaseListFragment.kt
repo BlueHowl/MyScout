@@ -88,4 +88,8 @@ class PhaseListFragment : Fragment(), IPhaseRecyclerCallback, ISetMeetingInfos {
             return PhaseListFragment()
         }
     }
+
+    override fun onPhaseDataAdd(phaseViewModels: Int) {
+        TODO("Not yet implemented")
+    }
 }

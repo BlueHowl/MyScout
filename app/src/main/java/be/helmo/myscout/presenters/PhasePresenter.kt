@@ -21,7 +21,7 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
     var phaseList: ArrayList<Phase> = ArrayList() //liste phase
     var phaseViewModels: ArrayList<PhaseListViewModel> = ArrayList() //list phase ViewModels
 
-    var recylcerCallback: IPhaseRecyclerCallback? = null
+    var recyclerCallback: IPhaseRecyclerCallback? = null
     var selectsPhaseCallback: ISelectPhaseCallback? = null
 
     var startTime: Date? = null
@@ -59,22 +59,47 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
     }
 
     override fun onBindPhaseRowViewAtPosition(position: Int, rowView: IPhaseRowView) {
-        /*val phase = phaseViewModels[position]
-        rowView.setTitle(phase.title)
+        val phase = phaseViewModels[position]
+        rowView.setTitle(phase.s)
         rowView.setDuration(phase.duration)
-        rowView.setDescription(phase.description)*/
+        rowView.setDescription(phase.description)
     }
 
     override fun getPhaseRowsCount(): Int {
-        TODO("Not yet implemented")
+        return phaseViewModels.size
     }
 
-    override fun addPhase(name: String, duration: String, description: String, images: String) {
-        TODO("Not yet implemented")
+    override fun modifyPhase(
+        uuid: UUID,
+        name: String,
+        resume: String,
+        duration: Long
+    ) {
+        phaseList.forEachIndexed{ index, phase ->
+            if (phase.id == uuid) {
+                phase.name = name
+                phase.description = resume
+                phase.duration = duration
+                myScoutRepository.updatePhase(phase)
+            }
+        }
+    }
+
+    override fun addPhase(name: String, duration: Long, resume: String) {
+        val phase = Phase(UUID.randomUUID(), name, resume, duration, "", false)
+        myScoutRepository.insertPhase(phase)
+        phaseList.add(phase)
+
+        GlobalScope.launch {
+            phaseViewModels.add(PhaseListViewModel(name, duration.toString(), resume))
+            recyclerCallback?.onPhaseDataAdd(phaseViewModels.size)
+        }
     }
 
     override fun removePhase(swipeItemPosition: Int) {
-        TODO("Not yet implemented")
+        myScoutRepository.deletePhase(phaseList[swipeItemPosition])
+        phaseList.removeAt(swipeItemPosition)
+        phaseViewModels.removeAt(swipeItemPosition)
     }
 
     override fun goToPhase(position: Int) {
