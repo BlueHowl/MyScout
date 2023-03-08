@@ -20,6 +20,7 @@ import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
 import be.helmo.myscout.presenters.interfaces.ISetMeetingInfos
 import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
+import be.helmo.myscout.view.interfaces.IMeetingPresenter
 import be.helmo.myscout.view.interfaces.IMeetingRecyclerCallbackPresenter
 
 import com.adevinta.leku.*
@@ -33,7 +34,7 @@ import java.util.*
  */
 class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener, ISetMeetingInfos {
-    lateinit var meetingPresenter: IMeetingRecyclerCallbackPresenter
+    lateinit var meetingPresenter: IMeetingPresenter
 
     var meeting: MeetingViewModel? = null
     var editMode: Boolean = false
@@ -56,6 +57,8 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     lateinit var etStory: EditText
 
     lateinit var btnAdd: Button
+
+    lateinit var ratingBar: RatingBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,6 +88,8 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         etDescription = view.findViewById(R.id.etDescription)
         etStory = view.findViewById(R.id.etStory)
 
+        ratingBar = view.findViewById(R.id.ratingBar)
+
         //bottombtns
         val btnCancel = view.findViewById<Button>(R.id.cancel)
         btnCancel.setOnClickListener {
@@ -103,9 +108,10 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                         startLocation!!,
                         endLocation!!,
                         etDescription.text.toString(),
-                        etStory.text.toString())
+                        etStory.text.toString(),
+                        ratingBar.rating)
 
-                    Toast.makeText(context, "Réunion modifiée", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Réunion modifiée", Toast.LENGTH_SHORT).show()
                 } else {
                     meetingPresenter.addMeeting(
                         startDateHour!!,
@@ -115,7 +121,7 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                         etDescription.text.toString(),
                         etStory.text.toString()
                     )
-                    Toast.makeText(context, "Réunion ajoutée", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Réunion ajoutée", Toast.LENGTH_SHORT).show()
                 }
 
                 activity?.onBackPressed() //todo changer?
@@ -179,7 +185,13 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
         //rend le btn edit_element invisible
         val editElement = requireActivity().findViewById<ImageView>(R.id.edit_element)
-        editElement.visibility = View.INVISIBLE
+        editElement.visibility = View.GONE
+
+        //rend le btn delete_element visible
+        if(editMode) {
+            val deleteElement = requireActivity().findViewById<ImageView>(R.id.delete_element)
+            deleteElement.visibility = View.VISIBLE
+        }
     }
 
     override fun setMeetingValues(meeting: MeetingViewModel?) {
@@ -207,6 +219,11 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         //texte du bouton devient modifier car si appel de cette fonction
         //alors on est dans le cas de modif
         btnAdd.setText(R.string.btn_modify)
+
+        ratingBar.visibility = View.VISIBLE
+        if(meeting?.rating != null) {
+            ratingBar.rating = meeting?.rating!!
+        }
     }
 
     //datehours

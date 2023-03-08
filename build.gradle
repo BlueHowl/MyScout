@@ -6,7 +6,7 @@ plugins {
 }
 
 ext {
-    appCompatVersion = '1.6.0'
+    appCompatVersion = '1.6.1'
     constraintLayoutVersion = '2.1.4'
     lifecycleVersion = '2.5.1'
     materialVersion = '1.8.0'

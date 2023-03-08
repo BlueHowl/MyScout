@@ -29,11 +29,8 @@ import kotlin.math.absoluteValue
  * A fragment representing a list of Items.
  */
 class PhaseListFragment : Fragment(), IPhaseRecyclerCallback, ISetMeetingInfos {
-
-    //var phaseListViewModel: PhaseListViewModel? = null
     var recyclerView: RecyclerView? = null
     lateinit var phasePresenter: IPhaseRecyclerCallbackPresenter
-    //var callback: ISelectPhase? = null
 
     var meeting: MeetingViewModel? = null
 
@@ -56,71 +53,8 @@ class PhaseListFragment : Fragment(), IPhaseRecyclerCallback, ISetMeetingInfos {
             recyclerView = view
             recyclerView!!.layoutManager = LinearLayoutManager(context)
             recyclerView!!.adapter = PhaseListAdapter(phasePresenter)
-
-            val itemTouchHelper = ItemTouchHelper(object :
-            ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT) {
-                override fun onMove(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    target: RecyclerView.ViewHolder
-                ): Boolean {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    if(direction == ItemTouchHelper.LEFT) {
-                        val swipedItemPosition = viewHolder.adapterPosition
-                        recyclerView!!.adapter!!.notifyItemRemoved(swipedItemPosition)
-                        phasePresenter.removePhase(swipedItemPosition)
-                    }
-                }
-
-                //transition couleur
-                override fun onChildDraw(
-                    c: Canvas,
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    dX: Float,
-                    dY: Float,
-                    actionState: Int,
-                    isCurrentlyActive: Boolean
-                ) {
-                    if(actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-                        val itemView = viewHolder.itemView
-                        val background = ColorDrawable(ContextCompat.getColor(itemView.context, R.color.red))
-
-                        if(dX < 0) {
-                            val swipeWidthPercentage = (dX.absoluteValue * 2 / itemView.width.toFloat()).coerceIn(0f, 1f)
-
-                            ValueAnimator.ofInt(0,(255 * swipeWidthPercentage).toInt()).apply {
-                                duration = 0
-                                addUpdateListener {animator ->
-                                    val alpha = animator.animatedValue as Int
-                                    background.alpha = alpha
-                                    itemView.setBackgroundColor(background.color)
-                                }
-                                start()
-                            }
-
-                            background.setBounds(
-                                itemView.right + dX.toInt(),
-                                itemView.top,
-                                itemView.right,
-                                itemView.bottom
-                            )
-                            background.draw(c)
-                        } else {
-                            background.alpha = 0
-                        }
-
-                        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                    }
-
-                }
-            })
-
-            itemTouchHelper.attachToRecyclerView(recyclerView)
         }
+
         return view
     }
 
@@ -139,6 +73,10 @@ class PhaseListFragment : Fragment(), IPhaseRecyclerCallback, ISetMeetingInfos {
         //rend le btn edit_element visible
         val editElement = requireActivity().findViewById<ImageView>(R.id.edit_element)
         editElement.visibility = View.VISIBLE
+
+        //rend le btn delete_element invisible
+        val deleteElement = requireActivity().findViewById<ImageView>(R.id.delete_element)
+        deleteElement.visibility = View.GONE
 
     }
 

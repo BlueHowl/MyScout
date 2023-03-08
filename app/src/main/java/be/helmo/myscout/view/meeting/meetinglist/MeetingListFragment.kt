@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -17,17 +18,18 @@ import androidx.recyclerview.widget.RecyclerView
 import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
 import be.helmo.myscout.factory.interfaces.IMeetingRecyclerCallback
+import be.helmo.myscout.view.interfaces.IMeetingPresenter
 import be.helmo.myscout.view.interfaces.IMeetingRecyclerCallbackPresenter
 import kotlin.math.absoluteValue
 
 class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
     var recyclerView: RecyclerView? = null
-    lateinit var meetingPresenter: IMeetingRecyclerCallbackPresenter
+    lateinit var meetingPresenter: IMeetingPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        meetingPresenter = PresenterSingletonFactory.instance!!.getRecyclerCallbackMeetingPresenter()
+        meetingPresenter = PresenterSingletonFactory.instance!!.getMeetingPresenter()
         meetingPresenter.setMeetingListCallback(this)
 
         Log.d(TAG, "onCreate called")
@@ -75,6 +77,7 @@ class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
                     if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
                         val itemView = viewHolder.itemView
                         val background = ColorDrawable(ContextCompat.getColor(itemView.context, R.color.red))
+                        val iconView = viewHolder.itemView.findViewById<ImageView>(R.id.delete_icon)
 
                         if (dX < 0) {
                             val swipeWidthPercentage = (dX.absoluteValue * 2 / itemView.width.toFloat()).coerceIn(0f, 1f)
@@ -89,6 +92,15 @@ class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
                                 start()
                             }
 
+                            ValueAnimator.ofFloat(0f, swipeWidthPercentage).apply {
+                                duration = 0
+                                addUpdateListener { animator ->
+                                    val alpha = animator.animatedValue as Float
+                                    iconView.alpha = alpha
+                                }
+                                start()
+                            }
+
                             background.setBounds(
                                 itemView.right + dX.toInt(),
                                 itemView.top,
@@ -98,6 +110,7 @@ class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
                             background.draw(c)
 
                         } else {
+                            iconView.alpha = 0f
                             background.alpha = 0
                         }
 
@@ -124,9 +137,13 @@ class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
         val addElement = requireActivity().findViewById<ImageView>(R.id.add_element)
         addElement.visibility = View.VISIBLE
 
+        //rend le btn delete_element invisible
+        val deleteElement = requireActivity().findViewById<ImageView>(R.id.delete_element)
+        deleteElement.visibility = View.GONE
+
         //rend le btn edit_element invisible
         val editElement = requireActivity().findViewById<ImageView>(R.id.edit_element)
-        editElement.visibility = View.INVISIBLE
+        editElement.visibility = View.GONE
     }
 
     override fun onAttach(context: Context) {

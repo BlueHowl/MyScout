@@ -3,6 +3,7 @@ package be.helmo.myscout.database.repository
 import android.util.Log
 import be.helmo.myscout.database.MyScoutDatabase
 import be.helmo.myscout.model.Meeting
+import be.helmo.myscout.model.MeetingPhaseJoin
 import be.helmo.myscout.model.Phase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.take
@@ -54,6 +55,10 @@ class MyScoutRepository {//private constructor() {
 
     fun deletePhase(phase: Phase?) {
         executor.execute { phaseDao?.delete(phase) }
+    }
+
+    fun insertMeetingPhaseJoin(meetingPhaseJoin: MeetingPhaseJoin) {
+        executor.execute { phaseDao?.insert(meetingPhaseJoin) }
     }
 
     companion object {

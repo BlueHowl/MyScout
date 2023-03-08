@@ -1,6 +1,7 @@
 package be.helmo.myscout.database.dao
 
 import androidx.room.*
+import be.helmo.myscout.model.MeetingPhaseJoin
 import be.helmo.myscout.model.Phase
 import kotlinx.coroutines.flow.Flow
 import java.util.*
@@ -26,4 +27,7 @@ interface PhaseDao {
 
     @Delete
     fun delete(phase: Phase?)
+
+    @Insert
+    fun insert(meetingPhaseJoin: MeetingPhaseJoin?) //todo separate DAO ?
 }

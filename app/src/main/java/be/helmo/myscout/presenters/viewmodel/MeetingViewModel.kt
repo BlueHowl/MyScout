@@ -5,12 +5,13 @@ import java.util.*
 
 data class MeetingViewModel(
     val meetId: UUID, //passe le id qd mm ?
-    val startDate: String?,
-    val endDate: String?,
-    val startAddress: String?,
-    val endAddress: String?,
-    val startLocation: LatLng?,
-    val endLocation: LatLng?,
-    val description: String?,
-    val story: String?
+    var startDate: String?,
+    var endDate: String?,
+    var startAddress: String?,
+    var endAddress: String?,
+    var startLocation: LatLng?,
+    var endLocation: LatLng?,
+    var description: String?,
+    var story: String?,
+    var rating: Float?
 )

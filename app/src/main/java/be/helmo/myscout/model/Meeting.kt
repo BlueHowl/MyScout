@@ -20,5 +20,7 @@ data class Meeting (
 
     var startLocation: LatLng,
 
-    var endLocation: LatLng
+    var endLocation: LatLng,
+
+    var rating: Float?
 )

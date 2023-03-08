@@ -4,7 +4,7 @@ import be.helmo.myscout.presenters.interfaces.IMeetingRowView
 import com.google.android.gms.maps.model.LatLng
 import java.util.*
 
-interface IMeetingPresenter {
+interface IMeetingPresenter : IMeetingRecyclerCallbackPresenter {
 
     fun onBindMeetingRowViewAtPosition(position: Int, rowView: IMeetingRowView)
 
@@ -23,9 +23,10 @@ interface IMeetingPresenter {
                       startLocation: LatLng,
                       endLocation: LatLng,
                       description: String,
-                      story: String)
+                      story: String,
+                      rating: Float)
 
-    fun removeMeeting(swipedItemPosition: Int)
+    fun removeMeeting(swipedItemPosition: Int?)
 
     fun goToMeeting(position: Int)
 
