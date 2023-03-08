@@ -36,6 +36,8 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
         this.meetingId = meetingId
         this.startTime = startDate
         GlobalScope.launch {
+            phaseViewModels.clear()
+            phaseList.clear()
             myScoutRepository.getPhases(meetingId)?.take(1)?.collect { phases ->
                 for (i in 0 until phases?.size!!) {
                     phases[i]?.let { phaseList.add(it) }
@@ -115,6 +117,7 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
         myScoutRepository.deletePhase(phaseList[swipeItemPosition])
         phaseList.removeAt(swipeItemPosition)
         phaseViewModels.removeAt(swipeItemPosition)
+
     }
 
     override fun goToPhase(position: Int) {
