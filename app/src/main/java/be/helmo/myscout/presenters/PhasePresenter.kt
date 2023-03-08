@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageRepository: IImageRepository) : IPhasePresenter, IPhasesSelectPhaseCallback {
+class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageRepository: IImageRepository) : IPhaseRecyclerCallbackPresenter, IPhasesSelectPhaseCallback {
     var phaseList: ArrayList<Phase> = ArrayList() //liste phase
     var phaseViewModels: ArrayList<PhaseListViewModel> = ArrayList() //list phase ViewModels
 
@@ -71,8 +71,9 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
 
     override fun onBindPhaseRowViewAtPosition(position: Int, rowView: IPhaseRowView) {
         val phase = phaseViewModels[position]
-        rowView.setName(phase.s)
-        rowView.setDateTime(phase.duration)
+        rowView.setTitle(phase.s)
+        rowView.setDuration(phase.duration)
+        rowView.setDescription(phase.description)
     }
 
     override fun getPhaseRowsCount(): Int {
@@ -118,10 +119,6 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
 
     override fun goToPhase(position: Int) {
         selectsPhaseCallback?.onSelectedPhase(phaseList[position], imageRepository.getImages(phaseList[position].id.toString())) //todo passer viewModel phase ?
-    }
-
-    override fun setPhaseListCallback(iPhaseRecyclerCallback: IPhaseRecyclerCallback?) {
-        recyclerCallback = iPhaseRecyclerCallback
     }
 
     override fun setSelectPhaseCallback(iSelectPhaseCallback: ISelectPhaseCallback?) {

@@ -5,7 +5,7 @@ import android.net.Uri
 import be.helmo.myscout.presenters.interfaces.IPhaseRowView
 import java.util.*
 
-interface IPhasePresenter : IPhaseRecyclerCallbackPresenter {
+interface IPhasePresenter {
 
     fun getPhases(meetingId: UUID, startDate: Date)
 

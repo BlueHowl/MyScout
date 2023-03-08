@@ -119,7 +119,8 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                         startLocation!!,
                         endLocation!!,
                         etDescription.text.toString(),
-                        etStory.text.toString()
+                        etStory.text.toString(),
+                        ratingBar.rating
                     )
                     Toast.makeText(context, "Réunion ajoutée", Toast.LENGTH_SHORT).show()
                 }

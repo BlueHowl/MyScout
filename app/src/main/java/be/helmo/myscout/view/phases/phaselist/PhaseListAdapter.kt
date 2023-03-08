@@ -3,14 +3,11 @@ package be.helmo.myscout.view.phases.phaselist
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import be.helmo.myscout.R
-import be.helmo.myscout.model.Phase
-import be.helmo.myscout.view.interfaces.IPhaseRecyclerCallbackPresenter
 import be.helmo.myscout.presenters.interfaces.IPhaseRowView
-import be.helmo.myscout.view.interfaces.IPhasePresenter
+import be.helmo.myscout.view.interfaces.IPhaseRecyclerCallbackPresenter
 
 class PhaseListAdapter(phaseListPresenter: IPhaseRecyclerCallbackPresenter) : RecyclerView.Adapter<PhaseListAdapter.PhaseViewHolder>() {
     private var presenter: IPhaseRecyclerCallbackPresenter? = phaseListPresenter

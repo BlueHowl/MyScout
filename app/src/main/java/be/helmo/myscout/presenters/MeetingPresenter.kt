@@ -9,6 +9,7 @@ import be.helmo.myscout.model.Meeting
 import be.helmo.myscout.presenters.interfaces.IMeetingRowView
 import be.helmo.myscout.presenters.viewmodel.MeetingListViewModel
 import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
+import be.helmo.myscout.view.interfaces.IMeetingPresenter
 import be.helmo.myscout.view.interfaces.IMeetingRecyclerCallbackPresenter
 import be.helmo.myscout.view.interfaces.IMeetingsSelectMeetingCallback
 import com.google.android.gms.maps.model.LatLng
@@ -22,7 +23,7 @@ import java.util.*
 
 
 class MeetingPresenter(var myScoutRepository: MyScoutRepository
-) : IMeetingRecyclerCallbackPresenter, IMeetingsSelectMeetingCallback, LifecycleService() {
+) : IMeetingRecyclerCallbackPresenter, IMeetingsSelectMeetingCallback, IMeetingPresenter, LifecycleService() {
     var meetingList: ArrayList<Meeting> = ArrayList<Meeting>() //liste meetings
     var meetingListViewModels: ArrayList<MeetingListViewModel> = ArrayList<MeetingListViewModel>() //list meetings ViewModels
 
@@ -64,8 +65,9 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
                    startLocation: LatLng,
                    endLocation: LatLng,
                    description: String,
-                   story: String) {
-        val meet = Meeting(UUID.randomUUID(), description, story, Date(startDateHour), Date(endDateHour), startLocation, endLocation) //todo changer conversion dates
+                   story: String,
+                   rating: Float) {
+        val meet = Meeting(UUID.randomUUID(), description, story, Date(startDateHour), Date(endDateHour), startLocation, endLocation,rating) //todo changer conversion dates
         myScoutRepository.insertMeeting(meet)
         meetingList.add(meet)
         //add to recylclerview
@@ -81,7 +83,8 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
                                startLocation: LatLng,
                                endLocation: LatLng,
                                description: String,
-                               story: String) {
+                               story: String,
+                               rating: Float) {
 
         meetingList.forEachIndexed { index, meeting ->
             if(meeting.id == meetId) {
@@ -91,6 +94,7 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
                 meeting.endDate = Date(endDateHour)
                 meeting.startLocation = startLocation
                 meeting.endLocation = endLocation
+                meeting.rating = rating
 
                 myScoutRepository.updateMeeting(meeting)
 
@@ -102,8 +106,8 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
         }
     }
 
-    override fun removeMeeting(swipedItemPosition: Int) {
-        myScoutRepository.deleteMeeting(meetingList[swipedItemPosition])
+    override fun removeMeeting(swipedItemPosition: Int?) {
+        myScoutRepository.deleteMeeting(meetingList[swipedItemPosition!!])
         meetingList.removeAt(swipedItemPosition)
         meetingListViewModels.removeAt(swipedItemPosition)
     }
@@ -124,7 +128,8 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
                     meeting.startLocation,
                     meeting.endLocation,
                     meeting.description,
-                    meeting.story
+                    meeting.story,
+                    meeting.rating
                 )
             )
         }
