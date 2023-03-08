@@ -6,29 +6,30 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import be.helmo.myscout.R
+import be.helmo.myscout.factory.PresenterSingletonFactory
 import be.helmo.myscout.factory.interfaces.IPhaseRecyclerCallback
-import be.helmo.myscout.model.Meeting
 import be.helmo.myscout.presenters.interfaces.ISetMeetingInfos
 import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
-import com.google.android.gms.maps.model.LatLng
-import java.util.*
+import be.helmo.myscout.view.interfaces.IPhasePresenter
 
 /**
  * A fragment representing a list of Items.
  */
 class PhaseListFragment : Fragment(), IPhaseRecyclerCallback, ISetMeetingInfos {
-
-    //var phaseListViewModel: PhaseListViewModel? = null
     var recyclerView: RecyclerView? = null
-    //var callback: ISelectPhase? = null
+    lateinit var phasePresenter: IPhasePresenter
 
     var meeting: MeetingViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate called")
+
+        phasePresenter = PresenterSingletonFactory.instance!!.getPhasePresenter()
+        phasePresenter.setPhaseListCallback(this)
     }
 
     override fun onCreateView(
@@ -39,14 +40,13 @@ class PhaseListFragment : Fragment(), IPhaseRecyclerCallback, ISetMeetingInfos {
         val view: View = inflater.inflate(R.layout.fragment_phase_list, container, false)
 
         // Set the adapter
-        /*
         if (view is RecyclerView) {
             val context = view.getContext()
             recyclerView = view
             recyclerView!!.layoutManager = LinearLayoutManager(context)
-            recyclerView!!.adapter =
-                PhaseAdapter(emptyList(), callback!!)
-        }*/
+            recyclerView!!.adapter = PhaseListAdapter(phasePresenter)
+        }
+
         return view
     }
 
@@ -76,16 +76,6 @@ class PhaseListFragment : Fragment(), IPhaseRecyclerCallback, ISetMeetingInfos {
         this.meeting = meeting
     }
 
-    /*
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return if (item.itemId == R.id.new_phase) {
-            val phase = Phase(UUID.randomUUID(), "", "", 0, "", false) //test
-            phaseListViewModel!!.addPhase(phase)
-            callback!!.onSelectedPhase(phase.id)
-            true
-        } else super.onOptionsItemSelected(item)
-    }*/
-
     companion object {
         private const val TAG = "PhaseListFragment"
         fun newInstance(): PhaseListFragment {
@@ -93,7 +83,9 @@ class PhaseListFragment : Fragment(), IPhaseRecyclerCallback, ISetMeetingInfos {
         }
     }
 
-    override fun onPhaseDataAdd(phaseViewModels: Int) {
-        TODO("Not yet implemented")
+    override fun onPhaseDataAdd(phaseIndex: Int) {
+        requireActivity().runOnUiThread {
+            recyclerView?.adapter?.notifyItemChanged(phaseIndex)
+        }
     }
 }

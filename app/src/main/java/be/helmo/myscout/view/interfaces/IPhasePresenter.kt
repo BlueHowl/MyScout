@@ -3,9 +3,11 @@ package be.helmo.myscout.view.interfaces
 import android.graphics.Bitmap
 import android.net.Uri
 import be.helmo.myscout.presenters.interfaces.IPhaseRowView
-import java.util.UUID
+import java.util.*
 
-interface IPhasePresenter {
+interface IPhasePresenter : IPhaseRecyclerCallbackPresenter {
+
+    fun getPhases(meetingId: UUID, startDate: Date)
 
     fun saveImage(imageToSave: Bitmap, phaseId: UUID) : Uri
 
@@ -15,11 +17,13 @@ interface IPhasePresenter {
 
     fun addPhase(name: String,
                  duration: Long,
-                 description: String)
+                 description: String,
+                 favorite: Boolean)
     fun modifyPhase(uuid: UUID,
                     name: String,
-                    resume: String,
-                    duration: Long)
+                    description: String,
+                    duration: Long,
+                    favorite: Boolean)
     fun removePhase(swipeItemPosition: Int)
 
     fun goToPhase(position: Int)

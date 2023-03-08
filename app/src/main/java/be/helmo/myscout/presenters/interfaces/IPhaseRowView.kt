@@ -1,8 +1,8 @@
 package be.helmo.myscout.presenters.interfaces
 
 interface IPhaseRowView {
-    fun setTitle(title: String?)
-    fun setDuration(duration: String?)
-    fun setDescription(description: String?)
-    fun setImages(images: String?)
+    fun setName(title: String?)
+
+    fun setDateTime(dateTime: String?)
+
 }

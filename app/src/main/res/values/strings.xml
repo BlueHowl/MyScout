@@ -13,6 +13,7 @@
     <string name="btn_modify">Valider</string>
     <string name="btn_cancel">Annuler</string>
     <string name="delete">Supprimer</string>
+    <string name="favorite">Mettre en favoris</string>
 
     <string name="start">Début</string>
     <string name="end">Fin</string>

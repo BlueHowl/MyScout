@@ -1,4 +1,8 @@
 package be.helmo.myscout.view.interfaces
 
-interface IPhaseRecyclerCallbackPresenter : IPhasePresenter {
+import be.helmo.myscout.factory.interfaces.IPhaseRecyclerCallback
+
+interface IPhaseRecyclerCallbackPresenter {
+
+    fun setPhaseListCallback(iPhaseRecyclerCallback: IPhaseRecyclerCallback?)
 }

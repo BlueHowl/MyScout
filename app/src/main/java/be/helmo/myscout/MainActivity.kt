@@ -15,6 +15,8 @@ import be.helmo.myscout.factory.interfaces.ISelectPhaseCallback
 import be.helmo.myscout.model.Phase
 import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
 import be.helmo.myscout.view.interfaces.IMeetingPresenter
+import be.helmo.myscout.view.interfaces.IPhasePresenter
+import be.helmo.myscout.view.interfaces.IPhaseRecyclerCallbackPresenter
 import be.helmo.myscout.view.meeting.EditMeetingFragment
 import be.helmo.myscout.view.meeting.meetinglist.MeetingListFragment
 import be.helmo.myscout.view.phases.EditPhaseFragment
@@ -28,6 +30,7 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
     var phaseListFragment: PhaseListFragment? = null //todo faire différement?
 
     lateinit var meetingPresenter: IMeetingPresenter
+    lateinit var phasesPresenter: IPhasePresenter //todo changer interface ?
 
     override fun onCreate(savedInstanceState: Bundle?) {
         this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -48,8 +51,8 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
         meetingPresenter = PresenterSingletonFactory.instance!!.getMeetingPresenter()
         PresenterSingletonFactory.instance!!.getSelectMeetingCallbackMeetingsPresenter().setSelectMeetingCallback(this)
 
-        val phasesPresenter = PresenterSingletonFactory.instance!!.getSelectPhaseCallbackPhasesPresenter()
-        phasesPresenter.setSelectPhaseCallback(this)
+        phasesPresenter = PresenterSingletonFactory.instance!!.getPhasePresenter()
+        PresenterSingletonFactory.instance!!.getSelectPhaseCallbackPhasesPresenter().setSelectPhaseCallback(this)
 
         //affiche le premier fragment
         supportFragmentManager.beginTransaction()
@@ -61,6 +64,7 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
         val fragmentManager: FragmentManager = supportFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
         phaseListFragment!!.setMeetingValues(meeting)
+        phasesPresenter.getPhases(meeting.meetId, Date(meeting.startDate)) //todo deprecated
 
         fragmentTransaction.replace(R.id.fragment_container, phaseListFragment!!)
         fragmentTransaction.addToBackStack(null)

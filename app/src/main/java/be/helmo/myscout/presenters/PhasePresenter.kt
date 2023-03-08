@@ -2,13 +2,17 @@ package be.helmo.myscout.presenters
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import be.helmo.myscout.database.repository.MyScoutRepository
 import be.helmo.myscout.factory.interfaces.IPhaseRecyclerCallback
 import be.helmo.myscout.factory.interfaces.ISelectPhaseCallback
+import be.helmo.myscout.model.Meeting
+import be.helmo.myscout.model.MeetingPhaseJoin
 import be.helmo.myscout.model.Phase
 import be.helmo.myscout.presenters.interfaces.IPhaseRowView
 import be.helmo.myscout.presenters.viewmodel.PhaseListViewModel
 import be.helmo.myscout.repositories.IImageRepository
+import be.helmo.myscout.view.interfaces.IPhasePresenter
 import be.helmo.myscout.view.interfaces.IPhaseRecyclerCallbackPresenter
 import be.helmo.myscout.view.interfaces.IPhasesSelectPhaseCallback
 import kotlinx.coroutines.GlobalScope
@@ -17,7 +21,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageRepository: IImageRepository) : IPhaseRecyclerCallbackPresenter, IPhasesSelectPhaseCallback {
+class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageRepository: IImageRepository) : IPhasePresenter, IPhasesSelectPhaseCallback {
     var phaseList: ArrayList<Phase> = ArrayList() //liste phase
     var phaseViewModels: ArrayList<PhaseListViewModel> = ArrayList() //list phase ViewModels
 
@@ -26,11 +30,13 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
 
     var startTime: Date? = null
 
-    fun getPhases(meetingId: UUID) {
+    var meetingId: UUID? = null
+
+    override fun getPhases(meetingId: UUID, startDate: Date) {
+        this.meetingId = meetingId
+        this.startTime = startDate
         GlobalScope.launch {
             myScoutRepository.getPhases(meetingId)?.take(1)?.collect { phases ->
-                var meeting = myScoutRepository.getMeeting(meetingId)
-                startTime = meeting?.startDate
                 for (i in 0 until phases?.size!!) {
                     phases[i]?.let { phaseList.add(it) }
                         phaseViewModels.add(
@@ -40,17 +46,18 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
                                 phases[i]?.description
                             )
                         )
-                    startTime = getRightTime(startTime!!, phases[i]?.duration.toString())
-                    //recylcerCallback?.onPhaseDataAdd(phaseViewModels.size)
+
+                    startTime = getRightTime(startTime!!, phases[i]?.duration!!.toInt())
+                    recyclerCallback?.onPhaseDataAdd(phaseViewModels.size)
                 }
             }
         }
     }
 
-    fun getRightTime(startTime: Date, duration: String): Date {
+    fun getRightTime(startTime: Date, duration: Int): Date {
         val time = startTime.time
-        val minutes = duration.split(":")[1].toInt()
-        val durationTime = minutes * 60 * 1000
+        //val minutes = duration.split(":")[1].toInt()
+        val durationTime = duration * 60 * 1000
         return Date(time + durationTime)
     }
 
@@ -60,9 +67,8 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
 
     override fun onBindPhaseRowViewAtPosition(position: Int, rowView: IPhaseRowView) {
         val phase = phaseViewModels[position]
-        rowView.setTitle(phase.s)
-        rowView.setDuration(phase.duration)
-        rowView.setDescription(phase.description)
+        rowView.setName(phase.s)
+        rowView.setDateTime(phase.duration)
     }
 
     override fun getPhaseRowsCount(): Int {
@@ -72,26 +78,30 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
     override fun modifyPhase(
         uuid: UUID,
         name: String,
-        resume: String,
-        duration: Long
+        description: String,
+        duration: Long,
+        favorite: Boolean
     ) {
         phaseList.forEachIndexed{ index, phase ->
             if (phase.id == uuid) {
                 phase.name = name
-                phase.description = resume
+                phase.description = description
                 phase.duration = duration
+                phase.favorite = favorite
                 myScoutRepository.updatePhase(phase)
             }
         }
     }
 
-    override fun addPhase(name: String, duration: Long, resume: String) {
-        val phase = Phase(UUID.randomUUID(), name, resume, duration, "", false)
+    override fun addPhase(name: String, duration: Long, description: String, favorite: Boolean) {
+        val phase = Phase(UUID.randomUUID(), name, description, duration, "", favorite)
+        val meetingPhaseJoin = MeetingPhaseJoin(UUID.randomUUID(), meetingId!!, phase.id)
         myScoutRepository.insertPhase(phase)
+        myScoutRepository.insertMeetingPhaseJoin(meetingPhaseJoin)
         phaseList.add(phase)
 
         GlobalScope.launch {
-            phaseViewModels.add(PhaseListViewModel(name, duration.toString(), resume))
+            phaseViewModels.add(PhaseListViewModel(name, duration.toString(), description))
             recyclerCallback?.onPhaseDataAdd(phaseViewModels.size)
         }
     }
@@ -103,7 +113,11 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
     }
 
     override fun goToPhase(position: Int) {
-        selectsPhaseCallback?.onSelectedPhase(phaseList[position], imageRepository.getImages(phaseList[position].id.toString()))
+        selectsPhaseCallback?.onSelectedPhase(phaseList[position], imageRepository.getImages(phaseList[position].id.toString())) //todo passer viewModel phase ?
+    }
+
+    override fun setPhaseListCallback(iPhaseRecyclerCallback: IPhaseRecyclerCallback?) {
+        recyclerCallback = iPhaseRecyclerCallback
     }
 
     override fun setSelectPhaseCallback(iSelectPhaseCallback: ISelectPhaseCallback?) {

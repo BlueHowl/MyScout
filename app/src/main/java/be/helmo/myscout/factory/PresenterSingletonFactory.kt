@@ -33,7 +33,7 @@ class PresenterSingletonFactory() {
         return phasePresenter
     }
 
-    fun getPhasePresenter(): IPhaseRecyclerCallbackPresenter {
+    fun getPhasePresenter(): IPhasePresenter {
         return phasePresenter
     }
 

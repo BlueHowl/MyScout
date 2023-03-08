@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.View.OnTouchListener
 import android.widget.*
 import androidx.fragment.app.Fragment
 import be.helmo.myscout.R
@@ -17,7 +18,6 @@ import be.helmo.myscout.model.Phase
 import be.helmo.myscout.presenters.interfaces.IEditPhaseFragment
 import be.helmo.myscout.view.interfaces.IPhasePresenter
 import java.io.ByteArrayOutputStream
-import kotlin.collections.ArrayList
 
 
 class EditPhaseFragment : Fragment(), IEditPhaseFragment {
@@ -41,6 +41,7 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
     lateinit var phaseAbortBtn: Button
     lateinit var phaseValidateBtn: Button
     lateinit var imageSwitcher: ImageSwitcher
+    lateinit var favorite: RatingBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +63,7 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
         phaseAbortBtn = view.findViewById(R.id.phase_abort_btn)
         phaseValidateBtn = view.findViewById(R.id.phase_validate_btn)
         imageSwitcher = view.findViewById(R.id.phase_image_switcher)
+        favorite = view.findViewById(R.id.favorite)
 
         // initialisation des composants
         imageSwitcher.setFactory { ImageView(context) }
@@ -83,17 +85,33 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
             activity?.onBackPressed() //todo changer?
         }
 
+        favorite.setOnTouchListener(OnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                favorite.rating = when(favorite.rating) {
+                    1F -> 0F
+                    0F -> 1F
+                    else -> {0F}
+                }
+            }
+            true
+        })
+
         phaseValidateBtn.setOnClickListener() {
             if(duringText.text.toString().isEmpty() || resumeText.text.toString().isEmpty())
                 Toast.makeText(context, "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show()
             else{
                 if(editMode){
-                    phasePresenter.modifyPhase(phase!!.id, nameText.text.toString(), resumeText.text.toString(), duringText.text.toString().toLong())
+                    phasePresenter.modifyPhase(phase!!.id,
+                        nameText.text.toString(),
+                        resumeText.text.toString(),
+                        duringText.text.toString().toLong(),
+                        favorite.rating >= 1F)
                 }else{
                     phasePresenter.addPhase(
                         nameText.text.toString(),
                         duringText.text.toString().toLong(),
-                        resumeText.text.toString()
+                        resumeText.text.toString(),
+                        favorite.rating >= 1F
                     )
                 }
                 activity?.onBackPressed() //todo changer?

@@ -11,7 +11,7 @@ import be.helmo.myscout.view.interfaces.IMeetingPresenter
 import be.helmo.myscout.view.interfaces.IMeetingRecyclerCallbackPresenter
 
 class MeetingListAdapter(meetingListPresenter: IMeetingPresenter) : RecyclerView.Adapter<MeetingListAdapter.MeetingViewHolder?>() {
-    private var presenter: IMeetingPresenter? = meetingListPresenter
+    var presenter: IMeetingPresenter? = meetingListPresenter
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MeetingViewHolder {
         return MeetingViewHolder(
