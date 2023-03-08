@@ -10,7 +10,7 @@ import java.util.*
 @Dao
 interface MeetingDao {
 
-    @get:Query("SELECT * FROM Meeting")
+    @get:Query("SELECT * FROM Meeting ORDER BY startDate")
     val meetings: Flow<List<Meeting?>?>?
 
     @Query("SELECT id, description, story, startDate, endDate, startLocation, endLocation FROM Meeting " +

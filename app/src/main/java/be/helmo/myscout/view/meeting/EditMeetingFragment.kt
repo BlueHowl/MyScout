@@ -20,6 +20,7 @@ import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
 import be.helmo.myscout.presenters.interfaces.ISetMeetingInfos
 import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
+import be.helmo.myscout.view.interfaces.IMeetingPresenter
 import be.helmo.myscout.view.interfaces.IMeetingRecyclerCallbackPresenter
 
 import com.adevinta.leku.*
@@ -33,7 +34,7 @@ import java.util.*
  */
 class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener, ISetMeetingInfos {
-    lateinit var meetingPresenter: IMeetingRecyclerCallbackPresenter
+    lateinit var meetingPresenter: IMeetingPresenter
 
     var meeting: MeetingViewModel? = null
     var editMode: Boolean = false
@@ -179,7 +180,13 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
         //rend le btn edit_element invisible
         val editElement = requireActivity().findViewById<ImageView>(R.id.edit_element)
-        editElement.visibility = View.INVISIBLE
+        editElement.visibility = View.GONE
+
+        //rend le btn delete_element visible
+        if(editMode) {
+            val deleteElement = requireActivity().findViewById<ImageView>(R.id.delete_element)
+            deleteElement.visibility = View.VISIBLE
+        }
     }
 
     override fun setMeetingValues(meeting: MeetingViewModel?) {

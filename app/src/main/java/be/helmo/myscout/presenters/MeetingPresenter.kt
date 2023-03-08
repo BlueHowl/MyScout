@@ -1,7 +1,6 @@
 package be.helmo.myscout.presenters
 
 import android.util.Log
-import androidx.lifecycle.LifecycleService
 import be.helmo.myscout.database.repository.MyScoutRepository
 import be.helmo.myscout.factory.interfaces.IMeetingRecyclerCallback
 import be.helmo.myscout.factory.interfaces.ISelectMeetingCallback
@@ -9,7 +8,7 @@ import be.helmo.myscout.model.Meeting
 import be.helmo.myscout.presenters.interfaces.IMeetingRowView
 import be.helmo.myscout.presenters.viewmodel.MeetingListViewModel
 import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
-import be.helmo.myscout.view.interfaces.IMeetingRecyclerCallbackPresenter
+import be.helmo.myscout.view.interfaces.IMeetingPresenter
 import be.helmo.myscout.view.interfaces.IMeetingsSelectMeetingCallback
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.GlobalScope
@@ -22,12 +21,14 @@ import java.util.*
 
 
 class MeetingPresenter(var myScoutRepository: MyScoutRepository
-) : IMeetingRecyclerCallbackPresenter, IMeetingsSelectMeetingCallback, LifecycleService() {
+) : IMeetingPresenter, IMeetingsSelectMeetingCallback {
     var meetingList: ArrayList<Meeting> = ArrayList<Meeting>() //liste meetings
     var meetingListViewModels: ArrayList<MeetingListViewModel> = ArrayList<MeetingListViewModel>() //list meetings ViewModels
 
     var recylcerCallback: IMeetingRecyclerCallback? = null
     var selectsMeetingCallback: ISelectMeetingCallback? = null
+
+    var meetingListPosition: Int? = null
 
     init {
             GlobalScope.launch {
@@ -102,13 +103,20 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
         }
     }
 
-    override fun removeMeeting(swipedItemPosition: Int) {
-        myScoutRepository.deleteMeeting(meetingList[swipedItemPosition])
-        meetingList.removeAt(swipedItemPosition)
-        meetingListViewModels.removeAt(swipedItemPosition)
+    override fun removeMeeting(swipedItemPosition: Int?) {
+        if(swipedItemPosition != null) {
+            myScoutRepository.deleteMeeting(meetingList[swipedItemPosition])
+            meetingList.removeAt(swipedItemPosition)
+            meetingListViewModels.removeAt(swipedItemPosition)
+        } else {
+            myScoutRepository.deleteMeeting(meetingList[meetingListPosition!!])
+            meetingList.removeAt(meetingListPosition!!)
+            meetingListViewModels.removeAt(meetingListPosition!!)
+        }
     }
 
     override fun goToMeeting(position: Int) {
+        meetingListPosition = position
         val meeting = meetingList[position]
         val startdate = SimpleDateFormat("dd/MM/yyyy hh:mm").format(meeting.startDate)
         val enddate = SimpleDateFormat("dd/MM/yyyy hh:mm").format(meeting.endDate)

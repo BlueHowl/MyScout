@@ -66,6 +66,10 @@ class PhaseListFragment : Fragment(), IPhaseRecyclerCallback, ISetMeetingInfos {
         val editElement = requireActivity().findViewById<ImageView>(R.id.edit_element)
         editElement.visibility = View.VISIBLE
 
+        //rend le btn delete_element invisible
+        val deleteElement = requireActivity().findViewById<ImageView>(R.id.delete_element)
+        deleteElement.visibility = View.GONE
+
     }
 
     override fun setMeetingValues(meeting: MeetingViewModel?) {

@@ -12,6 +12,7 @@
     <string name="btn_add">Ajouter</string>
     <string name="btn_modify">Valider</string>
     <string name="btn_cancel">Annuler</string>
+    <string name="delete">Supprimer</string>
 
     <string name="start_date_hour">Date et heure de début</string>
     <string name="end_date_hour">Date et heure de fin</string>

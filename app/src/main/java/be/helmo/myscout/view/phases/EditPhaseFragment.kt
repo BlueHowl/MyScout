@@ -147,7 +147,13 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
 
         //rend le btn edit_element invisible
         val editElement = requireActivity().findViewById<ImageView>(R.id.edit_element)
-        editElement.visibility = View.INVISIBLE
+        editElement.visibility = View.GONE
+
+        //rend le btn delete_element visible
+        if(editMode) {
+            val deleteElement = requireActivity().findViewById<ImageView>(R.id.delete_element)
+            deleteElement.visibility = View.VISIBLE
+        }
     }
 
     override fun setPhaseValues(phase: Phase, images: ArrayList<Uri>?) {
