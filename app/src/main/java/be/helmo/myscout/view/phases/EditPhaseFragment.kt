@@ -16,6 +16,7 @@ import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
 import be.helmo.myscout.model.Phase
 import be.helmo.myscout.presenters.interfaces.IEditPhaseFragment
+import be.helmo.myscout.presenters.viewmodel.PhaseViewModel
 import be.helmo.myscout.view.interfaces.IPhasePresenter
 import java.io.ByteArrayOutputStream
 
@@ -23,7 +24,7 @@ import java.io.ByteArrayOutputStream
 class EditPhaseFragment : Fragment(), IEditPhaseFragment {
     lateinit var phasePresenter: IPhasePresenter
 
-    var phase: Phase? = null
+    var phase: PhaseViewModel? = null
     var editMode: Boolean = false
 
     var images: ArrayList<Uri?>? = ArrayList()
@@ -65,6 +66,8 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
         imageSwitcher = view.findViewById(R.id.phase_image_switcher)
         favorite = view.findViewById(R.id.favorite)
 
+        applyPhaseValues()
+
         // initialisation des composants
         imageSwitcher.setFactory { ImageView(context) }
 
@@ -101,7 +104,7 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
                 Toast.makeText(context, "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show()
             else{
                 if(editMode){
-                    phasePresenter.modifyPhase(phase!!.id,
+                    phasePresenter.modifyPhase(phase!!.phaseId!!,
                         nameText.text.toString(),
                         resumeText.text.toString(),
                         duringText.text.toString().toLong(),
@@ -174,17 +177,21 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
         }
     }
 
-    override fun setPhaseValues(phase: Phase, images: ArrayList<Uri>?) {
-        this.phase = phase
-
-        if(images != null) {
-            editMode = true
-
-            view?.findViewById<TextView>(R.id.et_phase_name)?.text = phase.name
-            view?.findViewById<TextView>(R.id.phase_duration)?.text = phase.duration.toString()
-            view?.findViewById<TextView>(R.id.phase_resume)?.text = phase.description
-            this.images?.addAll(images)
+    override fun setPhaseValues(phase: PhaseViewModel, images: ArrayList<Uri>?) {
+        if(phase!=null) {
+            this.phase = phase
+            if(images != null) {
+                editMode = true
+                this.images?.addAll(images)
+            }
         }
+    }
+
+    fun applyPhaseValues(){
+        nameText.setText(phase?.name)
+        duringText.setText(phase?.duration.toString())
+        resumeText.setText(phase?.description)
+        favorite.rating = if(phase?.favorite == true) 1F else 0F
     }
 
     fun pickImagesIntent() {
@@ -242,7 +249,7 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
         val bytes = ByteArrayOutputStream()
         inImage?.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
 
-        return phasePresenter.saveImage(inImage!!, phase!!.id)
+        return phasePresenter.saveImage(inImage!!, phase!!.phaseId!!)
     }
 
     fun compressUri(c: Context?, uri: Uri?): Uri {

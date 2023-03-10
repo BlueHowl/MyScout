@@ -20,9 +20,6 @@ class MyScoutRepository {//private constructor() {
     val meetings: Flow<List<Meeting?>?>?
         get() = meetingDao?.meetings
 
-    fun getMeeting(meetingUUID: UUID?): Meeting? {
-        return null;
-    }
     fun insertMeeting(meeting: Meeting?) {
         Log.d("meetingDao", meetingDao?.meetings.toString()) //null wtf
         executor.execute { meetingDao?.insert(meeting) }
@@ -54,7 +51,7 @@ class MyScoutRepository {//private constructor() {
     }
 
     fun deletePhase(phase: Phase?) {
-        executor.execute { phaseDao?.delete(phase) }
+        executor.execute { phaseDao?.delete(phase?.id) }
     }
 
     fun insertMeetingPhaseJoin(meetingPhaseJoin: MeetingPhaseJoin) {

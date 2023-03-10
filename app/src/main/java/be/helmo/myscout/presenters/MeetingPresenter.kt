@@ -106,10 +106,11 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
         }
     }
 
-    override fun removeMeeting(swipedItemPosition: Int?) {
-        myScoutRepository.deleteMeeting(meetingList[swipedItemPosition!!])
-        meetingList.removeAt(swipedItemPosition)
-        meetingListViewModels.removeAt(swipedItemPosition)
+    override fun removeMeeting(uuid: UUID) {
+        val index = meetingList.indexOf(meetingList.find { it.id == uuid })
+        myScoutRepository.deleteMeeting(meetingList[index])
+        meetingList.removeAt(index)
+        meetingListViewModels.removeAt(index)
     }
 
     override fun goToMeeting(position: Int) {

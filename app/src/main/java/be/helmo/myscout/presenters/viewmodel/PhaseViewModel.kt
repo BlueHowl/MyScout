@@ -1,5 +1,6 @@
 package be.helmo.myscout.presenters.viewmodel
 
+import android.media.Rating
 import java.util.UUID
 
 data class PhaseViewModel (

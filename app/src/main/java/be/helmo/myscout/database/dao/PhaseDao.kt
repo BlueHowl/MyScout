@@ -25,8 +25,11 @@ interface PhaseDao {
     @Update
     fun update(phase: Phase?)
 
-    @Delete
-    fun delete(phase: Phase?)
+    // how to specify an other table than the one in the entity ?
+
+
+    @Query("DELETE FROM MeetingPhaseJoin WHERE phaseId = (:uuid)")
+    fun delete(uuid: UUID?)
 
     @Insert
     fun insert(meetingPhaseJoin: MeetingPhaseJoin?) //todo separate DAO ?

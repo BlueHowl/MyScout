@@ -24,7 +24,7 @@ interface IPhasePresenter {
                     description: String,
                     duration: Long,
                     favorite: Boolean)
-    fun removePhase(swipeItemPosition: Int)
+    fun removePhase(swipeItemPosition: UUID)
 
     fun goToPhase(position: Int)
 

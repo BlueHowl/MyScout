@@ -2,17 +2,15 @@ package be.helmo.myscout.presenters
 
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import be.helmo.myscout.database.repository.MyScoutRepository
 import be.helmo.myscout.factory.interfaces.IPhaseRecyclerCallback
 import be.helmo.myscout.factory.interfaces.ISelectPhaseCallback
-import be.helmo.myscout.model.Meeting
 import be.helmo.myscout.model.MeetingPhaseJoin
 import be.helmo.myscout.model.Phase
 import be.helmo.myscout.presenters.interfaces.IPhaseRowView
 import be.helmo.myscout.presenters.viewmodel.PhaseListViewModel
+import be.helmo.myscout.presenters.viewmodel.PhaseViewModel
 import be.helmo.myscout.repositories.IImageRepository
-import be.helmo.myscout.view.interfaces.IPhasePresenter
 import be.helmo.myscout.view.interfaces.IPhaseRecyclerCallbackPresenter
 import be.helmo.myscout.view.interfaces.IPhasesSelectPhaseCallback
 import kotlinx.coroutines.GlobalScope
@@ -88,7 +86,8 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
         description: String,
         duration: Long,
         favorite: Boolean
-    ) {
+    )
+    {
         phaseList.forEachIndexed{ index, phase ->
             if (phase.id == uuid) {
                 phase.name = name
@@ -97,8 +96,14 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
                 phase.favorite = favorite
                 myScoutRepository.updatePhase(phase)
             }
+            GlobalScope.launch {
+                phaseViewModels[index].s = phase.name
+                phaseViewModels[index].duration = phase.duration.toString()
+                phaseViewModels[index].description = phase.description
+            }
         }
     }
+
 
     override fun addPhase(name: String, duration: Long, description: String, favorite: Boolean) {
         val phase = Phase(UUID.randomUUID(), name, description, duration, "", favorite)
@@ -113,15 +118,18 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
         }
     }
 
-    override fun removePhase(swipeItemPosition: Int) {
-        myScoutRepository.deletePhase(phaseList[swipeItemPosition])
-        phaseList.removeAt(swipeItemPosition)
-        phaseViewModels.removeAt(swipeItemPosition)
+    override fun removePhase(uuid: UUID) {
+        val index = phaseList.indexOf(phaseList.find { it.id == uuid })
+        myScoutRepository.deletePhase(phaseList[index])
+        phaseList.removeAt(index)
+        phaseViewModels.removeAt(index)
 
     }
 
     override fun goToPhase(position: Int) {
-        selectsPhaseCallback?.onSelectedPhase(phaseList[position], imageRepository.getImages(phaseList[position].id.toString())) //todo passer viewModel phase ?
+        val currentPhase = phaseList[position]
+        val phaseViewModel = PhaseViewModel(currentPhase.id, currentPhase.name, currentPhase.description, currentPhase.duration, currentPhase.notice, currentPhase.favorite)
+        selectsPhaseCallback?.onSelectedPhase(phaseViewModel, imageRepository.getImages(phaseList[position].id.toString())) //todo passer viewModel phase ?
     }
 
     override fun setSelectPhaseCallback(iSelectPhaseCallback: ISelectPhaseCallback?) {

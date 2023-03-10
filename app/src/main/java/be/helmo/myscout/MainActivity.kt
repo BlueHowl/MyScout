@@ -14,9 +14,9 @@ import be.helmo.myscout.factory.interfaces.ISelectMeetingCallback
 import be.helmo.myscout.factory.interfaces.ISelectPhaseCallback
 import be.helmo.myscout.model.Phase
 import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
+import be.helmo.myscout.presenters.viewmodel.PhaseViewModel
 import be.helmo.myscout.view.interfaces.IMeetingPresenter
 import be.helmo.myscout.view.interfaces.IPhasePresenter
-import be.helmo.myscout.view.interfaces.IPhaseRecyclerCallbackPresenter
 import be.helmo.myscout.view.meeting.EditMeetingFragment
 import be.helmo.myscout.view.meeting.meetinglist.MeetingListFragment
 import be.helmo.myscout.view.phases.EditPhaseFragment
@@ -31,6 +31,8 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
 
     lateinit var meetingPresenter: IMeetingPresenter
     lateinit var phasesPresenter: IPhasePresenter //todo changer interface ?
+    lateinit var currentMeetingUUID: UUID
+    lateinit var currentPhaseUUID: UUID
 
     override fun onCreate(savedInstanceState: Bundle?) {
         this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -60,6 +62,7 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
     }
 
     override fun onSelectedMeeting(meeting: MeetingViewModel) {
+        currentMeetingUUID = meeting.meetId
         phaseListFragment = PhaseListFragment.newInstance()
         val fragmentManager: FragmentManager = supportFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
@@ -71,16 +74,17 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
         fragmentTransaction.commit()
     }
 
-    override fun onSelectedPhase(phase: Phase, images: ArrayList<Uri>) {
+    override fun onSelectedPhase(phase: PhaseViewModel, images: ArrayList<Uri>) {
+        currentPhaseUUID = phase.phaseId!!
         val fragment = EditPhaseFragment.newInstance()
         val fragmentManager: FragmentManager = supportFragmentManager
+
         fragment.setPhaseValues(phase, images)
 
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragment_container, fragment)
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
-
     }
 
     fun onAddElementClick(view: View) {
@@ -89,6 +93,7 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
             val fragment = EditMeetingFragment.newInstance()
             val fragmentManager: FragmentManager = this.supportFragmentManager
             val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+
             fragment.setMeetingValues(null)
 
             fragmentTransaction.replace(R.id.fragment_container, fragment)
@@ -98,7 +103,8 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
             val fragment = EditPhaseFragment.newInstance()
             val fragmentManager: FragmentManager = supportFragmentManager
             val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
-            fragment.setPhaseValues(Phase(UUID.randomUUID(), "", "", 0L, "",false), null)
+
+            fragment.setPhaseValues(PhaseViewModel(UUID.randomUUID(), "", "", 0L, "",false), null)
 
             fragmentTransaction.replace(R.id.fragment_container, fragment)
             fragmentTransaction.addToBackStack(null)
@@ -111,11 +117,11 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
         val fragmentManager: FragmentManager = this.supportFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
 
+        fragment.setMeetingValues(phaseListFragment?.meeting)
+
         fragmentTransaction.replace(R.id.fragment_container, fragment)
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
-
-        fragment.setMeetingValues(phaseListFragment?.meeting)
     }
 
     fun onDeleteElementClick(view: View) {
@@ -133,13 +139,14 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
         if(type == 0) {
             snackbar = Snackbar.make(view, "Supprimer la réunion ?", Snackbar.LENGTH_LONG)
                 .setAction(validate) {
-                    meetingPresenter.removeMeeting(null)
+                    meetingPresenter.removeMeeting(currentMeetingUUID)
                     onRemoveItemConfirm()
                 }
         } else if(type == 1) {
             snackbar = Snackbar.make(view, "Supprimer la phase ?", Snackbar.LENGTH_LONG)
                 .setAction(validate) {
                     //todo removePhase
+                    phasesPresenter.removePhase(currentPhaseUUID)
                     onRemoveItemConfirm()
                 }
         }

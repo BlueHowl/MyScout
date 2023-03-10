@@ -27,7 +27,7 @@ interface IMeetingPresenter :  IMeetingsSelectMeetingCallback, IMeetingRecyclerC
                       story: String,
                       rating: Float)
 
-    fun removeMeeting(swipedItemPosition: Int?)
+    fun removeMeeting(swipedItemPosition: UUID)
 
     fun goToMeeting(position: Int)
 

@@ -23,7 +23,7 @@ class PhaseListAdapter(phaseListPresenter: IPhaseRecyclerCallbackPresenter) : Re
         presenter!!.onBindPhaseRowViewAtPosition(position, holder)
 
         holder.itemView.setOnClickListener {
-            presenter!!.goToPhase(position);
+            presenter!!.goToPhase(position)
         }
     }
 

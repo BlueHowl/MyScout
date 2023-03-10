@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -19,7 +18,6 @@ import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
 import be.helmo.myscout.factory.interfaces.IMeetingRecyclerCallback
 import be.helmo.myscout.view.interfaces.IMeetingPresenter
-import be.helmo.myscout.view.interfaces.IMeetingRecyclerCallbackPresenter
 import kotlin.math.absoluteValue
 
 class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
@@ -60,7 +58,7 @@ class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
                     if(direction == ItemTouchHelper.LEFT) {
                         val swipedItemPosition = viewHolder.adapterPosition
                         recyclerView!!.adapter!!.notifyItemRemoved(swipedItemPosition)
-                        meetingPresenter.removeMeeting(swipedItemPosition)
+                        //meetingPresenter.removeMeeting()
                     }
                 }
 
