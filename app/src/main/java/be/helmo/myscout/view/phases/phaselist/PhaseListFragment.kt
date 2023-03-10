@@ -30,6 +30,8 @@ import kotlin.math.absoluteValue
  */
 class PhaseListFragment : Fragment(), IPhaseRecyclerCallback, ISetMeetingInfos {
     var recyclerView: RecyclerView? = null
+    var recyclerAdapter: IItemTouchHelperAdapter? = null
+
     lateinit var phasePresenter: IPhaseRecyclerCallbackPresenter
 
     var meeting: MeetingViewModel? = null
@@ -52,7 +54,13 @@ class PhaseListFragment : Fragment(), IPhaseRecyclerCallback, ISetMeetingInfos {
             val context = view.getContext()
             recyclerView = view
             recyclerView!!.layoutManager = LinearLayoutManager(context)
-            recyclerView!!.adapter = PhaseListAdapter(phasePresenter)
+            val adapter = PhaseListAdapter(phasePresenter)
+            recyclerAdapter = adapter
+            recyclerView!!.adapter = adapter
+
+            val itemTouchHelperCallback = ItemTouchHelperCallback(recyclerAdapter!!, phasePresenter)
+            val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+            itemTouchHelper.attachToRecyclerView(recyclerView)
         }
 
         return view

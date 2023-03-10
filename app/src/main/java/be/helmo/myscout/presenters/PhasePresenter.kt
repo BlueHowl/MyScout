@@ -2,6 +2,7 @@ package be.helmo.myscout.presenters
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import be.helmo.myscout.database.repository.MyScoutRepository
 import be.helmo.myscout.factory.interfaces.IPhaseRecyclerCallback
 import be.helmo.myscout.factory.interfaces.ISelectPhaseCallback
@@ -105,8 +106,8 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
     }
 
 
-    override fun addPhase(name: String, duration: Long, description: String, favorite: Boolean) {
-        val phase = Phase(UUID.randomUUID(), name, description, duration, "", favorite)
+    override fun addPhase(uuid: UUID, name: String, duration: Long, description: String, favorite: Boolean) {
+        val phase = Phase(uuid, name, description, duration, "", favorite)
         val meetingPhaseJoin = MeetingPhaseJoin(UUID.randomUUID(), meetingId!!, phase.id)
         myScoutRepository.insertPhase(phase)
         myScoutRepository.insertMeetingPhaseJoin(meetingPhaseJoin)
@@ -126,9 +127,22 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
 
     }
 
+    override fun removePhaseAt(index: Int) {
+        myScoutRepository.deletePhase(phaseList[index])
+        phaseList.removeAt(index)
+        phaseViewModels.removeAt(index)
+
+    }
+
+    override fun movePhase(position: Int, direction: Int) {
+        Collections.swap(phaseViewModels, position, position + direction)
+    }
+
     override fun goToPhase(position: Int) {
         val currentPhase = phaseList[position]
         val phaseViewModel = PhaseViewModel(currentPhase.id, currentPhase.name, currentPhase.description, currentPhase.duration, currentPhase.notice, currentPhase.favorite)
+        Log.d("test : ", phaseList[position].id.toString())
+        Log.d("test : ", imageRepository.getImages(phaseList[position].id.toString()).size.toString())
         selectsPhaseCallback?.onSelectedPhase(phaseViewModel, imageRepository.getImages(phaseList[position].id.toString())) //todo passer viewModel phase ?
     }
 
