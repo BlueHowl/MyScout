@@ -1,15 +1,15 @@
 package be.helmo.myscout.database
 
 import android.content.Context
-import androidx.room.Database
+import androidx.room.*
 import androidx.room.Room.databaseBuilder
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
+import androidx.room.util.TableInfo
 import be.helmo.myscout.database.dao.MeetingDao
 import be.helmo.myscout.database.dao.PhaseDao
 import be.helmo.myscout.model.Meeting
 import be.helmo.myscout.model.MeetingPhaseJoin
 import be.helmo.myscout.model.Phase
+import java.util.UUID
 
 @Database(entities = [Meeting::class, Phase::class, MeetingPhaseJoin::class], version = 1, exportSchema = false)
 @TypeConverters(MyScoutTypeConverters::class)

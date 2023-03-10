@@ -12,12 +12,12 @@ import java.util.*
     foreignKeys = [ForeignKey(
         entity = Meeting::class,
         childColumns = ["meetingId"],
-        parentColumns = ["id"]),
+        parentColumns = ["id"],
+        onDelete = ForeignKey.CASCADE),
         ForeignKey(
             entity = Phase::class,
             childColumns = ["phaseId"],
-            parentColumns = ["id"]
-        )],
+            parentColumns = ["id"])],
     indices = [
         Index(value = ["phaseId"])
     ])
