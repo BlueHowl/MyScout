@@ -35,7 +35,7 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
 
     var meetingId: UUID? = null
 
-    val sdf: SimpleDateFormat = SimpleDateFormat("EEEdd hh:mm")
+    val sdf: SimpleDateFormat = SimpleDateFormat("EEE hh:mm")
 
     override fun getPhases(meetingId: UUID, startDate: Date) {
         this.meetingId = meetingId
@@ -83,8 +83,7 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
     override fun onBindPhaseRowViewAtPosition(position: Int, rowView: IPhaseRowView) {
         val phase = phaseListViewModels[position]
         rowView.setTitle(String.format("#%d %s", phase.num, phase.s))
-        rowView.setStartTime(phase.startTime)
-        rowView.setDuration(String.format("%dmin", phase.duration))
+        rowView.setStartTime(String.format("%s(%dmin)", phase.startTime, phase.duration))
         rowView.setDescription(phase.description)
     }
 

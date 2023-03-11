@@ -53,13 +53,11 @@ class PhaseListAdapter(phaseListPresenter: IPhaseRecyclerCallbackPresenter) : Re
 
         var titleTextView: TextView
         var startTimeTextView: TextView
-        var durationTextView: TextView
         var descriptionTextView: TextView
 
         init {
             titleTextView = itemView.findViewById(R.id.t_phase_name)
             startTimeTextView = itemView.findViewById(R.id.t_phase_startTime)
-            durationTextView = itemView.findViewById(R.id.t_phase_duration)
             descriptionTextView = itemView.findViewById(R.id.t_phase_resume)
         }
 
@@ -69,10 +67,6 @@ class PhaseListAdapter(phaseListPresenter: IPhaseRecyclerCallbackPresenter) : Re
 
         override fun setStartTime(startTime: String?) {
             startTimeTextView.text = startTime
-        }
-
-        override fun setDuration(duration: String?) {
-            durationTextView.text = duration
         }
 
         override fun setDescription(description: String?) {
