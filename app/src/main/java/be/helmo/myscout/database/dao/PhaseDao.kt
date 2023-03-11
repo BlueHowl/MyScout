@@ -8,14 +8,14 @@ import java.util.*
 
 @Dao
 interface PhaseDao {
-    @Query("SELECT P.id, P.name, P.description, P.duration, P.notice, P.favorite FROM " +
+    @Query("SELECT P.id, P.num, P.name, P.description, P.duration, P.notice, P.favorite FROM " +
             "Phase AS P " +
             "JOIN MeetingPhaseJoin AS MPJ ON P.id = MPJ.phaseId " +
             "JOIN Meeting AS M ON M.id = MPJ.meetingId " +
-            "WHERE M.id = (:uuid)")
+            "WHERE M.id = (:uuid) ORDER BY P.num")
     fun getPhases(uuid: UUID?): Flow<List<Phase?>?>?
 
-    @Query("SELECT id, name, description, duration, notice, favorite FROM Phase " +
+    @Query("SELECT id, num, name, description, duration, notice, favorite FROM Phase " +
             "WHERE id = (:uuid)")
     fun getPhase(uuid: UUID?): Flow<Phase?>?
 

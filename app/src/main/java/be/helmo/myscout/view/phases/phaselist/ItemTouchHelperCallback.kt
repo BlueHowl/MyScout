@@ -3,21 +3,20 @@ package be.helmo.myscout.view.phases.phaselist
 import android.animation.ValueAnimator
 import android.graphics.Canvas
 import android.graphics.drawable.ColorDrawable
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getColor
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import be.helmo.myscout.MainActivity
 import be.helmo.myscout.R
-import be.helmo.myscout.presenters.PhasePresenter
 import be.helmo.myscout.view.interfaces.IPhaseRecyclerCallbackPresenter
-import com.google.android.material.snackbar.Snackbar
-import java.text.FieldPosition
 import kotlin.math.absoluteValue
 
 class ItemTouchHelperCallback(val adapter: IItemTouchHelperAdapter, val phasePresenter: IPhaseRecyclerCallbackPresenter) : ItemTouchHelper.SimpleCallback(0, 0) {
+
+    var dragFrom = -1
+    var dragTo = -1
 
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
         val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
@@ -25,7 +24,16 @@ class ItemTouchHelperCallback(val adapter: IItemTouchHelperAdapter, val phasePre
     }
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-        adapter.onItemMove(viewHolder.adapterPosition, target.adapterPosition)
+        val fromPosition = viewHolder.adapterPosition
+        val toPosition = target.adapterPosition
+
+        if (dragFrom == -1) {
+            dragFrom = fromPosition
+        }
+        dragTo = toPosition
+
+        adapter.onItemMove(fromPosition, toPosition)
+
         return true
     }
 
@@ -113,6 +121,13 @@ class ItemTouchHelperCallback(val adapter: IItemTouchHelperAdapter, val phasePre
         if (viewHolder is IItemTouchHelperViewHolder) {
             viewHolder.onItemClear()
         }
+
+        if(dragFrom != -1 && dragTo != -1 && dragFrom != dragTo) {
+            adapter.onItemDragEnd(dragFrom, dragTo)
+        }
+
+        dragFrom = -1
+        dragTo = -1;
     }
 
 }

@@ -100,7 +100,7 @@ class PhaseListFragment : Fragment(), IPhaseRecyclerCallback, ISetMeetingInfos {
         //callback = null
     }
 
-    override fun onPhaseDataAdd(phaseIndex: Int){
+    override fun onPhaseDataChanged(phaseIndex: Int) {
         requireActivity().runOnUiThread {
             recyclerView?.adapter?.notifyItemChanged(phaseIndex)
         }

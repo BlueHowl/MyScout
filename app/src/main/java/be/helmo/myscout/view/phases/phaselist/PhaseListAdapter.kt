@@ -1,6 +1,5 @@
 package be.helmo.myscout.view.phases.phaselist
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,17 +35,13 @@ class PhaseListAdapter(phaseListPresenter: IPhaseRecyclerCallbackPresenter) : Re
     }
 
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
-        if (fromPosition < toPosition) {
-            for (i in fromPosition until toPosition) {
-                presenter!!.movePhase(i, 1)
-            }
-        } else {
-            for (i in fromPosition downTo toPosition + 1) {
-                presenter!!.movePhase(i, -1)
-            }
-        }
         notifyItemMoved(fromPosition, toPosition)
+
         return true
+    }
+
+    override fun onItemDragEnd(fromPosition: Int, toPosition: Int) {
+        presenter!!.movePhase(fromPosition, toPosition)
     }
 
     override fun onItemRemove(position: Int) {
@@ -56,18 +51,24 @@ class PhaseListAdapter(phaseListPresenter: IPhaseRecyclerCallbackPresenter) : Re
     inner class PhaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
         IPhaseRowView, IItemTouchHelperViewHolder {
 
-        private var titleTextView: TextView
-        private var durationTextView: TextView
-        private var descriptionTextView: TextView
+        var titleTextView: TextView
+        var startTimeTextView: TextView
+        var durationTextView: TextView
+        var descriptionTextView: TextView
 
         init {
             titleTextView = itemView.findViewById(R.id.t_phase_name)
+            startTimeTextView = itemView.findViewById(R.id.t_phase_startTime)
             durationTextView = itemView.findViewById(R.id.t_phase_duration)
             descriptionTextView = itemView.findViewById(R.id.t_phase_resume)
         }
 
         override fun setTitle(title: String?) {
             titleTextView.text = title
+        }
+
+        override fun setStartTime(startTime: String?) {
+            startTimeTextView.text = startTime
         }
 
         override fun setDuration(duration: String?) {
@@ -91,6 +92,8 @@ class PhaseListAdapter(phaseListPresenter: IPhaseRecyclerCallbackPresenter) : Re
 
 interface IItemTouchHelperAdapter {
     fun onItemMove(fromPosition: Int, toPosition: Int): Boolean
+
+    fun onItemDragEnd(fromPosition: Int, toPosition: Int)
 
     fun onItemRemove(position: Int)
 }

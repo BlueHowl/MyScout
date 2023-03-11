@@ -29,7 +29,7 @@ interface IPhasePresenter {
 
     fun removePhaseAt(index: Int)
 
-    fun movePhase(position: Int, direction: Int)
+    fun movePhase(position: Int, toPosition: Int)
 
     fun goToPhase(position: Int)
 
