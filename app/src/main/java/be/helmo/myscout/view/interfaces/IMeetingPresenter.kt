@@ -29,6 +29,8 @@ interface IMeetingPresenter :  IMeetingsSelectMeetingCallback, IMeetingRecyclerC
 
     fun removeMeeting(swipedItemPosition: UUID)
 
+    fun removeMeetingAt(index: Int)
+
     fun goToMeeting(position: Int)
 
 }

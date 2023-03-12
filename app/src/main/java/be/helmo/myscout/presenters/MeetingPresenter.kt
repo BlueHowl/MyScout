@@ -113,6 +113,12 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
         meetingListViewModels.removeAt(index)
     }
 
+    override fun removeMeetingAt(index: Int) {
+        myScoutRepository.deleteMeeting(meetingList[index])
+        meetingList.removeAt(index)
+        meetingListViewModels.removeAt(index)
+    }
+
     override fun goToMeeting(position: Int) {
         val meeting = meetingList[position]
         val startdate = SimpleDateFormat("dd/MM/yyyy hh:mm").format(meeting.startDate)

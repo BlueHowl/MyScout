@@ -12,7 +12,6 @@ import androidx.fragment.app.FragmentTransaction
 import be.helmo.myscout.factory.PresenterSingletonFactory
 import be.helmo.myscout.factory.interfaces.ISelectMeetingCallback
 import be.helmo.myscout.factory.interfaces.ISelectPhaseCallback
-import be.helmo.myscout.model.Phase
 import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
 import be.helmo.myscout.presenters.viewmodel.PhaseViewModel
 import be.helmo.myscout.view.interfaces.IMeetingPresenter
@@ -126,41 +125,31 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
 
     fun onDeleteElementClick(view: View) {
         if(supportFragmentManager.findFragmentById(R.id.fragment_container) is EditMeetingFragment) {
-            onSnack(view, 0)
+            confirmSnack(view, 0)
         } else if(supportFragmentManager.findFragmentById(R.id.fragment_container) is EditPhaseFragment) {
-            onSnack(view, 1)
+            confirmSnack(view, 1)
         }
     }
 
-    fun onSnack(view: View, type: Int) {
-        var snackbar: Snackbar? = null
-        val validate = "Supprimer"
-
-        if(type == 0) {
-            snackbar = Snackbar.make(view, "Supprimer la réunion ?", Snackbar.LENGTH_LONG)
-                .setAction(validate) {
+    fun confirmSnack(view: View, type: Int) {
+        val snackbar: Snackbar = Snackbar.make(view, if(type == 0) "Supprimer la réunion ?" else "Supprimer la phase ?", Snackbar.LENGTH_LONG)
+            .setAction("Supprimer") {
+                if(type == 0) {
                     meetingPresenter.removeMeeting(currentMeetingUUID)
-                    onRemoveItemConfirm()
+                } else {
+                    phasesPresenter.removePhase(currentMeetingUUID)
                 }
-        } else if(type == 1) {
-            snackbar = Snackbar.make(view, "Supprimer la phase ?", Snackbar.LENGTH_LONG)
-                .setAction(validate) {
-                    //todo removePhase
-                    phasesPresenter.removePhase(currentPhaseUUID)
-                    onRemoveItemConfirm()
-                }
-        }
 
-        snackbar?.setActionTextColor(getColor(R.color.red))
-        val snackbarView = snackbar?.view
-        snackbarView?.setBackgroundColor(getColor(R.color.green))
+                onBackPressed() //todo changer?
+                onBackPressed() //todo changer?
 
-        snackbar?.show()
-    }
+            }
 
-    fun onRemoveItemConfirm() {
-        onBackPressed() //todo changer?
-        onBackPressed() //todo changer?
+        snackbar.setActionTextColor(getColor(R.color.red))
+        val snackbarView = snackbar.view
+        snackbarView.setBackgroundColor(getColor(R.color.green))
+
+        snackbar.show()
     }
 
     /**

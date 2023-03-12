@@ -34,7 +34,7 @@ class ImageRepository : IImageRepository{
 
     override fun getImages(imagesDirectory: String): ArrayList<Uri> {
         val images: ArrayList<Uri> = ArrayList()
-        val dir = File(imagesDirectory)
+        val dir = File(MainActivity.appContext.getExternalFilesDir(null), String.format("%s%s", "/images/", imagesDirectory))
         val files = dir.listFiles()
         files?.forEach {
             images.add(it.toUri())

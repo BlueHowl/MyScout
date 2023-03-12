@@ -68,7 +68,6 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
         imageSwitcher = view.findViewById(R.id.phase_image_switcher)
         favorite = view.findViewById(R.id.favorite)
 
-        applyPhaseValues()
 
         // initialisation des composants
         imageSwitcher.setFactory { ImageView(context) }
@@ -113,6 +112,7 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
                         favorite.rating >= 1F)
                 }else{
                     phasePresenter.addPhase(
+                        phase!!.phaseId!!,
                         nameText.text.toString(),
                         duringText.text.toString().toLong(),
                         resumeText.text.toString(),
@@ -153,6 +153,8 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
             gestureDetector.onTouchEvent(event)
             true}
 
+        applyPhaseValues()
+
         return view
     }
 
@@ -180,12 +182,10 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
     }
 
     override fun setPhaseValues(phase: PhaseViewModel, images: ArrayList<Uri>?) {
-        if(phase!=null) {
-            this.phase = phase
-            if(images != null) {
-                editMode = true
-                this.images?.addAll(images)
-            }
+        this.phase = phase
+        if(images != null) {
+            editMode = true
+            this.images?.addAll(images)
         }
     }
 
@@ -194,6 +194,11 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
         duringText.setText(phase?.duration.toString())
         resumeText.setText(phase?.description)
         favorite.rating = if(phase?.favorite == true) 1F else 0F
+
+        images?.forEach {
+            if(it != null)
+                imageSwitcher.setImageURI(it)
+        }
     }
 
     fun pickImagesIntent() {

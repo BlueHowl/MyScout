@@ -1,5 +1,6 @@
 package be.helmo.myscout.factory.interfaces
 
 interface IPhaseRecyclerCallback {
-    fun onPhaseDataAdd(phaseViewModels: Int)
+
+    fun onPhaseDataChanged(phaseIndex: Int)
 }
