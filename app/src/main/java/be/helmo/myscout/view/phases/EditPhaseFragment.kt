@@ -6,19 +6,21 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Bundle
+import android.os.Bundle import android.os.Parcelable
+import android.provider.MediaStore
 import android.util.Log
 import android.view.*
 import android.view.View.OnTouchListener
 import android.widget.*
+import androidx.core.graphics.TypefaceCompatUtil.getTempFile
 import androidx.fragment.app.Fragment
 import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
-import be.helmo.myscout.model.Phase
 import be.helmo.myscout.presenters.interfaces.IEditPhaseFragment
 import be.helmo.myscout.presenters.viewmodel.PhaseViewModel
 import be.helmo.myscout.view.interfaces.IPhasePresenter
 import java.io.ByteArrayOutputStream
+import java.io.File
 
 
 class EditPhaseFragment : Fragment(), IEditPhaseFragment {
@@ -195,11 +197,57 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
     }
 
     fun pickImagesIntent() {
+        // can you make a menu for choosing the camera or galery
+        var chooserIntent: Intent
+
+        var intentList: List<Intent> = ArrayList()
+
+        val pickIntent = Intent(
+            Intent.ACTION_PICK,
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        )
+        val takePhotoIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        takePhotoIntent.putExtra("return-data", true)
+        takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(File(context?.cacheDir, "pickImageResult.jpeg")))
+        intentList = addIntentsToList(context, intentList as ArrayList<Intent>, pickIntent)
+        intentList = addIntentsToList(context, intentList as ArrayList<Intent>, takePhotoIntent)
+
+        if (intentList.size > 0) {
+            chooserIntent = Intent.createChooser(
+                intentList.removeAt(intentList.size - 1),
+                context?.getString(R.string.pick_image_intent_text)
+            )
+            chooserIntent.putExtra(
+                Intent.EXTRA_INITIAL_INTENTS,
+                intentList.toTypedArray<Parcelable>()
+            )
+        }
+
+        /*return chooserIntent
         val intent = Intent()
         intent.type = "image/*"
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
         intent.action = Intent.ACTION_GET_CONTENT
         startActivityForResult(Intent.createChooser(intent, "Choisir photo"), pickImageCode)
+        */
+        */
+    }
+
+    private fun addIntentsToList(
+        context: Context?,
+        list: ArrayList<Intent>,
+        intent: Intent
+    ): MutableList<Intent> {
+        val resInfo = context?.packageManager?.queryIntentActivities(intent, 0)
+        if (resInfo != null) {
+            for (resolveInfo in resInfo) {
+                val packageName = resolveInfo.activityInfo.packageName
+                val targetedIntent = Intent(intent)
+                targetedIntent.setPackage(packageName)
+                list.add(targetedIntent)
+            }
+        }
+        return list
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
