@@ -9,8 +9,9 @@ import be.helmo.myscout.view.interfaces.*
 
 class PresenterSingletonFactory() {
 
-    val myScoutRepository: MyScoutRepository = MyScoutRepository.instance!!
     val imageRepository: IImageRepository = ImageRepository()
+    val myScoutRepository: MyScoutRepository = MyScoutRepository(imageRepository)
+
 
     val meetingPresenter: MeetingPresenter = MeetingPresenter(myScoutRepository)
     val phasePresenter: PhasePresenter = PhasePresenter(myScoutRepository, imageRepository)

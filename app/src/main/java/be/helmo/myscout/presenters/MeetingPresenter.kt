@@ -3,12 +3,15 @@ package be.helmo.myscout.presenters
 import android.util.Log
 import androidx.lifecycle.LifecycleService
 import be.helmo.myscout.database.repository.MyScoutRepository
+import be.helmo.myscout.factory.PresenterSingletonFactory
 import be.helmo.myscout.factory.interfaces.IMeetingRecyclerCallback
 import be.helmo.myscout.factory.interfaces.ISelectMeetingCallback
+import be.helmo.myscout.imageRepository.ImageRepository
 import be.helmo.myscout.model.Meeting
 import be.helmo.myscout.presenters.interfaces.IMeetingRowView
 import be.helmo.myscout.presenters.viewmodel.MeetingListViewModel
 import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
+import be.helmo.myscout.repositories.IImageRepository
 import be.helmo.myscout.view.interfaces.IMeetingPresenter
 import be.helmo.myscout.view.interfaces.IMeetingRecyclerCallbackPresenter
 import be.helmo.myscout.view.interfaces.IMeetingsSelectMeetingCallback
@@ -114,6 +117,7 @@ class MeetingPresenter(var myScoutRepository: MyScoutRepository
     }
 
     override fun removeMeetingAt(index: Int) {
+        //phasesPresenter.removePhasesImages(meetingList[index].id)
         myScoutRepository.deleteMeeting(meetingList[index])
         meetingList.removeAt(index)
         meetingListViewModels.removeAt(index)

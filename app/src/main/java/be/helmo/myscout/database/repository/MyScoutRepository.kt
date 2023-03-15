@@ -2,15 +2,20 @@ package be.helmo.myscout.database.repository
 
 import android.util.Log
 import be.helmo.myscout.database.MyScoutDatabase
+import be.helmo.myscout.imageRepository.ImageRepository
 import be.helmo.myscout.model.Meeting
 import be.helmo.myscout.model.MeetingPhaseJoin
 import be.helmo.myscout.model.Phase
+import be.helmo.myscout.repositories.IImageRepository
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.Executors
 
-class MyScoutRepository {//private constructor() {
+class MyScoutRepository(var imageRepository: IImageRepository) {//private constructor() {
     val meetingDao = MyScoutDatabase.getInstance()?.meetingDao()
     val phaseDao = MyScoutDatabase.getInstance()?.phaseDao()
 
@@ -30,7 +35,14 @@ class MyScoutRepository {//private constructor() {
     }
 
     fun deleteMeeting(meeting: Meeting?) {
-        executor.execute { meetingDao?.delete(meeting) }
+        GlobalScope.launch {
+            phaseDao?.getPhases(meeting?.id)?.take(1)?.collect{ phases ->
+                for (i in 0 until phases?.size!!) {
+                    imageRepository.deletePhaseImages(phases[i]!!)
+                }
+                executor.execute { meetingDao?.delete(meeting) }
+            }
+        }
     }
 
     //Phase
@@ -56,13 +68,5 @@ class MyScoutRepository {//private constructor() {
 
     fun insertMeetingPhaseJoin(meetingPhaseJoin: MeetingPhaseJoin) {
         executor.execute { phaseDao?.insert(meetingPhaseJoin) }
-    }
-
-    companion object {
-        var instance: MyScoutRepository? = null
-            get() {
-                if (field == null) field = MyScoutRepository()
-                return field
-            }
     }
 }

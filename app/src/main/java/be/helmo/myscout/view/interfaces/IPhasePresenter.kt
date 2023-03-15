@@ -1,7 +1,9 @@
 package be.helmo.myscout.view.interfaces
 
+import android.app.Activity
 import android.graphics.Bitmap
 import android.net.Uri
+import be.helmo.myscout.MainActivity
 import be.helmo.myscout.presenters.interfaces.IPhaseRowView
 import java.util.*
 
@@ -25,12 +27,15 @@ interface IPhasePresenter {
                     description: String,
                     duration: Long,
                     favorite: Boolean)
-    fun removePhase(swipeItemPosition: UUID)
+    fun removePhase(uuid: UUID)
 
     fun removePhaseAt(index: Int)
 
     fun movePhase(position: Int, toPosition: Int)
 
     fun goToPhase(position: Int)
+
+    fun deleteImage(imageUri: Uri?)
+    fun removePhasesImages(currentMeetingUUID: UUID)
 
 }

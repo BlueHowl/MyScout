@@ -15,7 +15,7 @@ import be.helmo.myscout.repositories.IImageRepository
 import be.helmo.myscout.view.interfaces.IPhaseRecyclerCallbackPresenter
 import be.helmo.myscout.view.interfaces.IPhasesSelectPhaseCallback
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -41,22 +41,23 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
         this.meetingId = meetingId
         this.currentStartDate = startDate
         this.tempTime = startDate
-
+        phaseListViewModels.clear()
+        phaseList.clear()
         GlobalScope.launch {
-            phaseListViewModels.clear()
-            phaseList.clear()
+
+
             myScoutRepository.getPhases(meetingId)?.take(1)?.collect { phases ->
                 for (i in 0 until phases?.size!!) {
-                    phases[i]?.let { phaseList.add(it) }
-                        phaseListViewModels.add(
-                            PhaseListViewModel(
-                                phaseListViewModels.size+1,
-                                phases[i]?.name,
-                                phases[i]?.duration,
-                                sdf.format(tempTime),
-                                phases[i]?.description
-                            )
+                    phaseList.add(phases[i]!!)
+                    phaseListViewModels.add(
+                        PhaseListViewModel(
+                            phaseListViewModels.size+1,
+                            phases[i]?.name,
+                            phases[i]?.duration,
+                            sdf.format(tempTime),
+                            phases[i]?.description
                         )
+                    )
 
                     tempTime = getRightTime(tempTime, phases[i]?.duration!!.toInt())
                     recyclerCallback?.onPhaseDataChanged(phaseListViewModels.size) //todo pq notifyInsert ne fonctionne pas
@@ -132,6 +133,7 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
     override fun removePhase(uuid: UUID) {
         val index = phaseList.indexOf(phaseList.find { it.id == uuid })
         myScoutRepository.deletePhase(phaseList[index])
+        imageRepository.deletePhaseImages(phaseList[index])
         phaseList.removeAt(index)
         phaseListViewModels.removeAt(index)
 
@@ -139,9 +141,9 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
 
     override fun removePhaseAt(index: Int) {
         myScoutRepository.deletePhase(phaseList[index])
+        imageRepository.deletePhaseImages(phaseList[index])
         phaseList.removeAt(index)
         phaseListViewModels.removeAt(index)
-
     }
 
     override fun movePhase(position: Int, toPosition: Int) {
@@ -173,6 +175,18 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
         val currentPhase = phaseList[position]
         val phaseViewModel = PhaseViewModel(currentPhase.id, currentPhase.name, currentPhase.description, currentPhase.duration, currentPhase.notice, currentPhase.favorite)
         selectsPhaseCallback?.onSelectedPhase(phaseViewModel, imageRepository.getImages(phaseList[position].id.toString())) //todo passer viewModel phase ?
+    }
+
+    override fun deleteImage(imageUri: Uri?) {
+        imageRepository.deleteImage(imageUri)
+    }
+
+    override fun removePhasesImages(currentMeetingUUID: UUID) {
+        GlobalScope.launch {
+        myScoutRepository.getPhases(currentMeetingUUID)?.take(1)?.collect { phases ->
+                imageRepository.deletePhasesImages(phases)
+            }
+        }
     }
 
     override fun setSelectPhaseCallback(iSelectPhaseCallback: ISelectPhaseCallback?) {

@@ -3,13 +3,13 @@ package be.helmo.myscout.view.phases
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -17,21 +17,26 @@ import android.util.Log
 import android.view.*
 import android.view.View.OnTouchListener
 import android.widget.*
-import androidx.core.app.ActivityCompat
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import androidx.core.content.PermissionChecker
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import be.helmo.myscout.MainActivity
 import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
 import be.helmo.myscout.presenters.interfaces.IEditPhaseFragment
 import be.helmo.myscout.presenters.viewmodel.PhaseViewModel
 import be.helmo.myscout.view.interfaces.IPhasePresenter
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.IOException
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class EditPhaseFragment : Fragment(), IEditPhaseFragment {
     lateinit var phasePresenter: IPhasePresenter
-
     var phase: PhaseViewModel? = null
     var editMode: Boolean = false
 
@@ -41,11 +46,9 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
 
     val pickImageCode = 0
 
-    val permission_request_code = 200
-    val REQUEST_ID_MULTIPLE_PERMISSIONS = 7
-    //test
-    val cameraPhotoCode = 1
+    private val cameraPhotoCode = 1
 
+    var photoFile: File? = null
     lateinit var nameText: EditText
     lateinit var duringText: EditText
     lateinit var resumeText: EditText
@@ -59,11 +62,7 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        onRequestPermissionsResult(
-            permission_request_code,
-            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-            intArrayOf(PackageManager.PERMISSION_GRANTED)
-        )
+
         phasePresenter = PresenterSingletonFactory.instance!!.getPhasePresenter()
 
     }
@@ -93,7 +92,7 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
                 pickImagesIntent()
             }
             else if(id==1){
-                cameraIntent()
+                dispatchTakePictureIntent()
             }
             false
         }
@@ -120,7 +119,11 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
         }
 
         phaseAbortBtn.setOnClickListener() {
-            activity?.onBackPressed() //todo changer?
+            position = 0
+            if(images?.size!! > 0) {
+                imageSwitcher.setImageURI(images?.get(position) ?: Uri.EMPTY)
+            }
+            activity?.onBackPressed()
         }
 
         favorite.setOnTouchListener(OnTouchListener { v, event ->
@@ -181,6 +184,28 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
                 }
                 return false
             }
+
+            override fun onLongPress(e: MotionEvent) {
+                super.onLongPress(e)
+                if (images?.size!! > 0) {
+                    val builder = AlertDialog.Builder(context)
+                    builder.setTitle("Supprimer l'image ?")
+                    builder.setPositiveButton("Oui") { _, _ ->
+                        phasePresenter.deleteImage(images?.get(position))
+                        images?.removeAt(position)
+                        if (images?.size!! > 0) {
+                            if (position == images?.size!! && position > 0) {
+                                position--
+                            }
+                            imageSwitcher.setImageURI(images?.get(position))
+                        } else {
+                            imageSwitcher.setImageURI(null)
+                        }
+                    }
+                    builder.setNegativeButton("Non") { _, _ -> }
+                    builder.show()
+                }
+            }
         })
 
         imageSwitcher?.setOnTouchListener { _, event -> gestureDetector.onTouchEvent(event)
@@ -191,19 +216,12 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
         return view
     }
 
-    private fun cameraIntent() {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        requestPermissions(
-            arrayOf(Manifest.permission.CAMERA),
-            permission_request_code
-        )
-        if(intent.resolveActivity(requireActivity().packageManager) != null){
-            if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED){
-                startActivityForResult(intent, cameraPhotoCode)
-            }
-        }
+    @Throws(IOException::class)
+    fun createImageFile(): File {
+        val directory = File(MainActivity.appContext.getExternalFilesDir(null), String.format("%s%s", "/images/", phase!!.phaseId.toString()))
+        val image = File(directory.absolutePath, String.format("%d.jpeg", directory.listFiles()?.size))
+        return image
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -246,111 +264,10 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
             if(it != null)
                 imageSwitcher.setImageURI(it)
         }
-    }
 
-    fun pickImagesIntent() {
-        val intent = Intent()
-        intent.type = "image/*"
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-        intent.action = Intent.ACTION_GET_CONTENT
-        startActivityForResult(Intent.createChooser(intent, "Choisir photo"), pickImageCode)
-    }
-
-    private fun checkAndRequestPermissions(): Boolean {
-        val camera = ContextCompat.checkSelfPermission(
-            requireActivity(),
-            Manifest.permission.CAMERA
-        )
-        val write = ContextCompat.checkSelfPermission(
-            requireActivity(),
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
-        val read =
-            ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
-        val listPermissionsNeeded: MutableList<String> = ArrayList()
-        if (write != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-        if (camera != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(Manifest.permission.CAMERA)
-        }
-        if (read != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-        }
-        if (!listPermissionsNeeded.isEmpty()) {
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                listPermissionsNeeded.toTypedArray<String>(),
-                REQUEST_ID_MULTIPLE_PERMISSIONS
-            )
-            return false
-        }
-        return true
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>, grantResults: IntArray
-    ) {
-        Log.d("in fragment on request", "Permission callback called-------")
-        when (requestCode) {
-            REQUEST_ID_MULTIPLE_PERMISSIONS -> {
-                val perms: MutableMap<String, Int> = HashMap()
-                // Initialize the map with both permissions
-                perms[Manifest.permission.CAMERA] = PackageManager.PERMISSION_GRANTED
-                // Fill with actual results from user
-                if (grantResults.size > 0) {
-                    var i = 0
-                    while (i < permissions.size) {
-                        perms[permissions[i]] = grantResults[i]
-                        i++
-                    }
-                    // Check for permission
-                    if (perms[Manifest.permission.CAMERA] == PackageManager.PERMISSION_GRANTED) {
-                        Log.d(
-                            "in fragment on request",
-                            "CAMERA permission granted"
-                        )
-                        // process the normal flow
-                        //else any one or both the permissions are not granted
-                    } else {
-                        Log.d(
-                            "in fragment on request",
-                            "Some permissions are not granted ask again "
-                        )
-                        //permission is denied (this is the first time, when "never ask again" is not checked) so ask again explaining the usage of permission
-//                        // shouldShowRequestPermissionRationale will return true
-                        //show the dialog or snackbar saying its necessary and try again otherwise proceed with setup.
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(
-                                requireActivity(),
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE
-                            ) || ActivityCompat.shouldShowRequestPermissionRationale(
-                                requireActivity(), Manifest.permission.CAMERA
-                            ) || ActivityCompat.shouldShowRequestPermissionRationale(
-                                requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE
-                            )
-                        ) {
-                            // the equivalent of showDialogOK from java
-                            AlertDialog.Builder(requireActivity())
-                                .setMessage("Les permissions pour la Camera et le Stockage sont requis pour cet application")
-                                .setPositiveButton("OK") { _, _ ->
-                                    checkAndRequestPermissions()
-                                }
-                                .setNegativeButton("Annuler", null)
-                                .create()
-                                .show()
-                        } else {
-                            Toast.makeText(
-                                activity,
-                                "Aller dans les parametres de l'application et autoriser les permissions",
-                                Toast.LENGTH_LONG
-                            )
-                                .show()
-                            //                            //proceed with logic by disabling the related features or quit the app.
-                        }
-                    }
-                }
-            }
+        if(images?.size!! > 0){
+            position = 0
+            imageSwitcher.setImageURI(images?.get(position))
         }
     }
 
@@ -362,13 +279,13 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
                 if(data!!.clipData != null){
                     val count = data.clipData!!.itemCount
                     for(i in 0 until count){
-                        val imageUri = compressUri(context, data.clipData!!.getItemAt(i).uri)
+                        val imageUri = compressUri(context,data.clipData!!.getItemAt(i).uri)
                         images?.add(imageUri)
                     }
                     imageSwitcher.setImageURI(images?.get(0))
                     position = 0
                 } else if(data.data != null){
-                    val imageUri = compressUri(context, data.data)
+                    val imageUri = compressUri(context,data.data!!)
                     images?.add(imageUri)
                     imageSwitcher.setImageURI(images?.get(0))
                     position = 0
@@ -376,11 +293,56 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
             }
         }else if(requestCode == cameraPhotoCode){
             if(resultCode == Activity.RESULT_OK){
-                val imageBitmap = data?.extras?.get("data") as Bitmap
-                val imageUri = getImageUri(imageBitmap)
-                images?.add(imageUri)
-                imageSwitcher.setImageURI(images?.get(0))
-                position = 0
+                photoFile?.let {
+                    val imageBitmap = rotateImageIfRequired(Uri.fromFile(it))
+                    val imageUri = compressUri(context,getImageUri(requireContext(),imageBitmap))
+                    images?.add(imageUri)
+                    imageSwitcher.setImageURI(images?.get(0))
+                    position = 0
+                }
+            }
+        }
+    }
+
+    private fun getImageUri(inContext: Context, inImage: Bitmap): Uri? {
+        val bytes = ByteArrayOutputStream()
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+        val path =
+            MediaStore.Images.Media.insertImage(inContext.contentResolver, inImage, "Title", null)
+        return Uri.parse(path)
+    }
+
+    private fun pickImagesIntent() {
+        val intent = Intent()
+        intent.type = "image/*"
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        intent.action = Intent.ACTION_GET_CONTENT
+        startActivityForResult(Intent.createChooser(intent, "Choisir photo"), pickImageCode)
+    }
+
+    private fun dispatchTakePictureIntent() {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            // Ensure that there's a camera activity to handle the intent
+            takePictureIntent.resolveActivity(requireActivity().packageManager)?.also {
+                // Create the File where the photo should go
+                photoFile = try {
+                    createImageFile()
+                } catch (ex: IOException) {
+                    // Error occurred while creating the File
+                    // print an error msg
+                    Log.d("ERROR", "An error occured")
+                    null
+                }
+                // Continue only if the File was successfully created
+                photoFile?.also {
+                    val photoURI: Uri = FileProvider.getUriForFile(
+                        requireContext(),
+                        "com.example.android.fileprovider",
+                        it
+                    )
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                    startActivityForResult(takePictureIntent, cameraPhotoCode)
+                }
             }
         }
     }
@@ -405,10 +367,32 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
         }
     }
 
-    fun getImageUri(inImage: Bitmap?): Uri {
-        val bytes = ByteArrayOutputStream()
-        inImage?.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+    // fonctions pour les images
+    @Throws(IOException::class)
+    private fun rotateImageIfRequired(selectedImage: Uri): Bitmap {
+        //get the path of the image from the context
+        val ei = ExifInterface(selectedImage.path!!)
+        val orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+        val imageBitmap = selectedImage.path?.let { BitmapFactory.decodeFile(it) }
+        return when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(imageBitmap, 90F)
+            ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(imageBitmap, 180F)
+            ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(imageBitmap, 270F)
+            else -> imageBitmap!!
+        }
+    }
 
+    fun rotateImage(source: Bitmap?, angle: Float): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(angle)
+        return Bitmap.createBitmap(source!!, 0, 0, source.width, source.height, matrix, true)
+    }
+
+    fun getImageUri(inImage: Bitmap?, needCompress: Boolean): Uri {
+        val bytes = ByteArrayOutputStream()
+        if(needCompress){
+            inImage?.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+        }
         return phasePresenter.saveImage(inImage!!, phase!!.phaseId!!)
     }
 
@@ -418,7 +402,16 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
         BitmapFactory.decodeStream(c?.contentResolver?.openInputStream(uri!!), null, o)
         val o2 = BitmapFactory.Options()
         o2.inSampleSize = 2
-        return getImageUri(BitmapFactory.decodeStream(uri?.let { c?.contentResolver?.openInputStream(it) }, null, o2))
+        return getImageUri(BitmapFactory.decodeStream(c?.contentResolver?.openInputStream(uri!!), null, o2), true)
+
+    }
+
+    fun compressUri(uri: Bitmap?): Uri {
+        val o = BitmapFactory.Options()
+        o.inJustDecodeBounds = true
+        val o2 = BitmapFactory.Options()
+        o2.inSampleSize = 2
+        return getImageUri(uri!!, true)
     }
 
     companion object {

@@ -5,10 +5,15 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.core.net.toUri
 import be.helmo.myscout.MainActivity
+import be.helmo.myscout.model.Phase
 import be.helmo.myscout.repositories.IImageRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.count
+import kotlinx.coroutines.flow.take
 import java.io.File
 import java.io.FileOutputStream
-import java.util.ArrayList
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class ImageRepository : IImageRepository{
@@ -19,9 +24,9 @@ class ImageRepository : IImageRepository{
             directory.mkdirs()
         }
 
-        val file = File(directory.absolutePath, String.format("%d.jpeg", directory.listFiles()?.size))
+        val file = File(directory.absolutePath, String.format("%s.jpeg", directory.listFiles()?.size))
         try {
-            val out = FileOutputStream(file)
+            val out = FileOutputStream(file,true)
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 100, out)
             out.flush()
             out.close()
@@ -41,6 +46,26 @@ class ImageRepository : IImageRepository{
         }
 
         return images
+    }
+
+    override fun deleteImage(imageToDelete: Uri?){
+        val file = File(imageToDelete?.path!!)
+        file.delete()
+    }
+
+    override fun deletePhaseImages(phase: Phase) {
+        val dir = File(MainActivity.appContext.getExternalFilesDir(null), String.format("%s%s", "/images/", phase.id.toString()))
+        val files = dir.listFiles()
+        files?.forEach {
+            it.delete()
+        }
+        dir.delete()
+    }
+
+    override fun deletePhasesImages(phases: List<Phase?>?) {
+        phases?.forEach {
+            deletePhaseImages(it!!)
+        }
     }
 
 }

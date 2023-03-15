@@ -1,12 +1,19 @@
 package be.helmo.myscout
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.Window
 import android.widget.ImageView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import be.helmo.myscout.factory.PresenterSingletonFactory
@@ -33,11 +40,35 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
     lateinit var currentMeetingUUID: UUID
     lateinit var currentPhaseUUID: UUID
 
+    lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
+    private var isCameraPermissionAllowed = false
+    private var isWritePermissionAllowed = false
+    private var isReadPermissionAllowed = false
+    private var isLocationCoarsePermissionAllowed = false
+    private var isInternetPermissionAllowed = false
+    private var isLocationFinePermissionAllowed = false
+    private var isReadMediaPermissionAllowed = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         //this.window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            isCameraPermissionAllowed = permissions[Manifest.permission.CAMERA] ?: isCameraPermissionAllowed
+            isLocationCoarsePermissionAllowed = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: isLocationCoarsePermissionAllowed
+            isInternetPermissionAllowed = permissions[Manifest.permission.INTERNET] ?: isInternetPermissionAllowed
+            isLocationFinePermissionAllowed = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: isLocationFinePermissionAllowed
+            isReadMediaPermissionAllowed = permissions[if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Manifest.permission.READ_MEDIA_IMAGES
+            } else {
+                isWritePermissionAllowed = permissions[Manifest.permission.WRITE_EXTERNAL_STORAGE] ?: isWritePermissionAllowed
+                isReadPermissionAllowed = permissions[Manifest.permission.READ_EXTERNAL_STORAGE] ?: isReadPermissionAllowed
+            }] ?: isReadMediaPermissionAllowed
+        }
+
+        checkAndRequestPermissions()
 
         appContext = applicationContext
 
@@ -58,6 +89,44 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
         //affiche le premier fragment
         supportFragmentManager.beginTransaction()
             .add(R.id.fragment_container, MeetingListFragment.newInstance()).commit()
+    }
+
+    private fun checkAndRequestPermissions(){
+        isCameraPermissionAllowed = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        isWritePermissionAllowed = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        isReadPermissionAllowed = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        isLocationCoarsePermissionAllowed = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        isLocationFinePermissionAllowed = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        isReadMediaPermissionAllowed = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+
+        val listPermissionsNeeded = ArrayList<String>()
+
+        if (!isReadPermissionAllowed) {
+            listPermissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+        if (!isWritePermissionAllowed) {
+            listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        if (!isCameraPermissionAllowed) {
+            listPermissionsNeeded.add(Manifest.permission.CAMERA)
+        }
+        if (!isLocationCoarsePermissionAllowed) {
+            listPermissionsNeeded.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+        }
+        if (!isInternetPermissionAllowed) {
+            listPermissionsNeeded.add(Manifest.permission.INTERNET)
+        }
+        if (!isLocationFinePermissionAllowed) {
+            listPermissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        if (!isReadMediaPermissionAllowed) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                listPermissionsNeeded.add(Manifest.permission.READ_MEDIA_IMAGES)
+            }
+        }
+        if (listPermissionsNeeded.isNotEmpty()) {
+            permissionLauncher.launch(listPermissionsNeeded.toTypedArray())
+        }
     }
 
     override fun onSelectedMeeting(meeting: MeetingViewModel) {
@@ -135,13 +204,14 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
         val snackbar: Snackbar = Snackbar.make(view, if(type == 0) "Supprimer la réunion ?" else "Supprimer la phase ?", Snackbar.LENGTH_LONG)
             .setAction("Supprimer") {
                 if(type == 0) {
+                    phasesPresenter.removePhasesImages(currentMeetingUUID)
                     meetingPresenter.removeMeeting(currentMeetingUUID)
                 } else {
-                    phasesPresenter.removePhase(currentMeetingUUID)
+                    phasesPresenter.removePhase(currentPhaseUUID)
                 }
 
-                onBackPressed() //todo changer?
-                onBackPressed() //todo changer?
+                onBackPressed()
+                onBackPressed()
 
             }
 
