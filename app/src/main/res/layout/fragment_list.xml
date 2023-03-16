@@ -5,6 +5,4 @@
     android:id="@+id/list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layoutManager="LinearLayoutManager"
-    tools:context=".view.phases.phaselist.PhaseListFragment"
-    tools:listitem="@layout/phase_list_item" />
+    app:layoutManager="LinearLayoutManager" />

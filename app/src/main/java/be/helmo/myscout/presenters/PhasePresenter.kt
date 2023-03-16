@@ -3,8 +3,6 @@ package be.helmo.myscout.presenters
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
-import be.helmo.myscout.MainActivity
 import be.helmo.myscout.database.repository.MyScoutRepository
 import be.helmo.myscout.factory.interfaces.IFavoritePhaseRecyclerCallback
 import be.helmo.myscout.factory.interfaces.IPhaseRecyclerCallback
@@ -17,10 +15,7 @@ import be.helmo.myscout.presenters.viewmodel.FavoritePhaseListViewModel
 import be.helmo.myscout.presenters.viewmodel.PhaseListViewModel
 import be.helmo.myscout.presenters.viewmodel.PhaseViewModel
 import be.helmo.myscout.repositories.IImageRepository
-import be.helmo.myscout.view.interfaces.IFavoritePhaseRecyclerCallbackPresenter
 import be.helmo.myscout.view.interfaces.IPhasePresenter
-import be.helmo.myscout.view.interfaces.IPhaseRecyclerCallbackPresenter
-import be.helmo.myscout.view.interfaces.IPhasesSelectPhaseCallback
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -192,15 +187,18 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
     }
 
     override fun removePhaseAt(index: Int) {
-        if(!phaseList[index].favorite){
-            myScoutRepository.deletePhase(phaseList[index])
-            imageRepository.deletePhaseImages(phaseList[index])
-            phaseList.removeAt(index)
-            phaseListViewModels.removeAt(index)
-            phaseRecyclerCallback?.onPhaseRemoved(index)
-        }else{
-            Toast.makeText(MainActivity.appContext, "Vous ne pouvez pas supprimer une phase favorite", Toast.LENGTH_SHORT).show()
+        if(phaseList[index].favorite) {
+            selectsPhaseCallback?.onPhaseFavoriteDelete()
+            phaseRecyclerCallback?.onPhaseDataChanged(index)
+            return
         }
+
+        myScoutRepository.deletePhase(phaseList[index])
+        imageRepository.deletePhaseImages(phaseList[index])
+        phaseList.removeAt(index)
+        phaseListViewModels.removeAt(index)
+        phaseRecyclerCallback?.onPhaseRemoved(index)
+
     }
 
     override fun movePhase(position: Int, toPosition: Int) {

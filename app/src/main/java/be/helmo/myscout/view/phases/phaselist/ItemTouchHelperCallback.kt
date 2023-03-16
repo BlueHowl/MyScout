@@ -41,6 +41,16 @@ class ItemTouchHelperCallback(val adapter: IItemTouchHelperAdapter, val phasePre
         if(direction == ItemTouchHelper.LEFT) {
             val swipedItemPosition = viewHolder.adapterPosition
 
+            /*if (viewHolder is IItemTouchHelperViewHolder) {
+                viewHolder.onItemClear()
+                val itemView = viewHolder.itemView
+                val iconView = itemView.findViewById<ImageView>(R.id.delete_icon2)
+
+                iconView.visibility = View.GONE
+                iconView.alpha = 0f
+                itemView.setBackgroundColor(0)
+            }*/ //TODO comment reset couleur ?
+
             phasePresenter.removePhaseAt(swipedItemPosition)
         }
     }
@@ -58,7 +68,7 @@ class ItemTouchHelperCallback(val adapter: IItemTouchHelperAdapter, val phasePre
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             val itemView = viewHolder.itemView
             val background = ColorDrawable(ContextCompat.getColor(itemView.context, R.color.red))
-            val iconView = viewHolder.itemView.findViewById<ImageView>(R.id.delete_icon2)
+            val iconView = itemView.findViewById<ImageView>(R.id.delete_icon2)
 
             if (dX < 0) {
                 iconView.visibility = View.VISIBLE
@@ -100,6 +110,7 @@ class ItemTouchHelperCallback(val adapter: IItemTouchHelperAdapter, val phasePre
 
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
         }
+
     }
 
     override fun isLongPressDragEnabled(): Boolean {

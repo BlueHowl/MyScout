@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
             .add(R.id.fragment_container, MeetingListFragment.newInstance()).commit()
     }
 
-    private fun checkAndRequestPermissions(){
+    private fun checkAndRequestPermissions() {
         isCameraPermissionAllowed = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
         isWritePermissionAllowed = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
         isReadPermissionAllowed = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
@@ -160,6 +160,10 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
         fragmentTransaction.replace(R.id.fragment_container, fragment)
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
+    }
+
+    override fun onPhaseFavoriteDelete() {
+        Toast.makeText(this, "Vous ne pouvez pas supprimer une phase favorite", Toast.LENGTH_SHORT).show()
     }
 
     fun onAddMeetingClick(View: View) {

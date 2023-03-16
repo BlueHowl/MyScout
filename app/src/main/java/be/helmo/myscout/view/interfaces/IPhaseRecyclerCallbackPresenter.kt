@@ -3,7 +3,7 @@ package be.helmo.myscout.view.interfaces
 import be.helmo.myscout.factory.interfaces.IPhaseRecyclerCallback
 import be.helmo.myscout.presenters.interfaces.IPhaseRowView
 
-interface IPhaseRecyclerCallbackPresenter {//: IPhasePresenter {
+interface IPhaseRecyclerCallbackPresenter {
 
         fun setPhaseListCallback(iPhaseListCallback: IPhaseRecyclerCallback?)
 

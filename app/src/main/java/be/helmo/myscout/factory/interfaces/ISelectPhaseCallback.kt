@@ -8,4 +8,5 @@ interface ISelectPhaseCallback {
 
     fun onSelectedPhase(phase: PhaseViewModel, images: ArrayList<Uri>?)
 
+    fun onPhaseFavoriteDelete()
 }
