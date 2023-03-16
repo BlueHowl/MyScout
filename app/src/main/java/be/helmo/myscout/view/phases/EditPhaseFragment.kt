@@ -1,28 +1,25 @@
 package be.helmo.myscout.view.phases
 
-import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.content.IntentFilter.AuthorityEntry
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.*
 import android.view.View.OnTouchListener
 import android.widget.*
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import be.helmo.myscout.MainActivity
+import be.helmo.myscout.BuildConfig
 import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
 import be.helmo.myscout.presenters.interfaces.IEditPhaseFragment
@@ -31,6 +28,8 @@ import be.helmo.myscout.view.interfaces.IPhasePresenter
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
+import java.security.AuthProvider
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -218,9 +217,10 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
 
     @Throws(IOException::class)
     fun createImageFile(): File {
-        val directory = File(MainActivity.appContext.getExternalFilesDir(null), String.format("%s%s", "/images/", phase!!.phaseId.toString()))
-        val image = File(directory.absolutePath, String.format("%d.jpeg", directory.listFiles()?.size))
-        return image
+        val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), String.format("%d.jpeg", path.listFiles()?.size))
+
+        return file
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -293,12 +293,14 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
             }
         }else if(requestCode == cameraPhotoCode){
             if(resultCode == Activity.RESULT_OK){
-                photoFile?.let {
-                    val imageBitmap = rotateImageIfRequired(Uri.fromFile(it))
-                    val imageUri = compressUri(context,getImageUri(requireContext(),imageBitmap))
-                    images?.add(imageUri)
-                    imageSwitcher.setImageURI(images?.get(0))
-                    position = 0
+                if(photoFile != null){
+                    photoFile?.let {
+                        val imageBitmap = rotateImageIfRequired(Uri.fromFile(it))
+                        val imageUri = getImageUri(requireContext(),imageBitmap)
+                        images?.add(compressUri(requireContext(),imageUri))
+                        imageSwitcher.setImageURI(images?.get(0))
+                        position = 0
+                    }
                 }
             }
         }
@@ -326,7 +328,10 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
             takePictureIntent.resolveActivity(requireActivity().packageManager)?.also {
                 // Create the File where the photo should go
                 photoFile = try {
-                    createImageFile()
+                    File.createTempFile(
+                        "JPEG_${SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())}_",
+                        ".jpg",
+                        requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES))
                 } catch (ex: IOException) {
                     // Error occurred while creating the File
                     // print an error msg
@@ -336,8 +341,8 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
                 // Continue only if the File was successfully created
                 photoFile?.also {
                     val photoURI: Uri = FileProvider.getUriForFile(
-                        requireContext(),
-                        "com.example.android.fileprovider",
+                        Objects.requireNonNull(requireContext()),
+                        BuildConfig.APPLICATION_ID + ".provider",
                         it
                     )
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)

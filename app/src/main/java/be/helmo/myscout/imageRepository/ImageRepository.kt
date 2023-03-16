@@ -2,6 +2,7 @@ package be.helmo.myscout.imageRepository
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.core.net.toUri
 import be.helmo.myscout.MainActivity
@@ -20,7 +21,10 @@ class ImageRepository : IImageRepository{
 
     override fun createDirectoryAndSaveImage(imageToSave: Bitmap, directoryName: String) : Uri {
         val directory = File(MainActivity.appContext.getExternalFilesDir(null), String.format("%s%s", "/images/", directoryName))
+        Log.d("ImageRepository", "createDirectoryAndSaveImage: directoryName: $directoryName")
+        Log.d("ImageRepository", "createDirectoryAndSaveImage: directory: ${directory.path}")
         if (!directory.exists()) {
+            Log.d("ImageRepository", "createDirectoryAndSaveImage: directory created")
             directory.mkdirs()
         }
 
