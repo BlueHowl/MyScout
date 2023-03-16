@@ -38,7 +38,9 @@ class MyScoutRepository(var imageRepository: IImageRepository) {//private constr
         GlobalScope.launch {
             phaseDao?.getPhases(meeting?.id)?.take(1)?.collect{ phases ->
                 for (i in 0 until phases?.size!!) {
-                    imageRepository.deletePhaseImages(phases[i]!!)
+                    if(phases[i]?.favorite == false){
+                        imageRepository.deletePhaseImages(phases[i]!!)
+                    }
                 }
                 executor.execute { meetingDao?.delete(meeting) }
             }

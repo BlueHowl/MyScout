@@ -36,6 +36,10 @@ interface IPhasePresenter {
     fun goToPhase(position: Int)
 
     fun deleteImage(imageUri: Uri?)
+
     fun removePhasesImages(currentMeetingUUID: UUID)
+
+    fun getFavoritePhases(meetingId: UUID)
+    fun isPhaseNotFavorite(currentPhaseUUID: UUID): Boolean
 
 }

@@ -6,9 +6,12 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.view.Window
+import android.util.AttributeSet
+import android.util.Log
+import android.view.*
 import android.widget.ImageView
+import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -39,6 +42,7 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
     lateinit var phasesPresenter: IPhasePresenter //todo changer interface ?
     lateinit var currentMeetingUUID: UUID
     lateinit var currentPhaseUUID: UUID
+    lateinit var elementAdd: ImageView
 
     lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
     private var isCameraPermissionAllowed = false
@@ -73,10 +77,12 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
         appContext = applicationContext
 
 
-        val elementAdd = findViewById<ImageView>(R.id.add_element)
+        elementAdd = findViewById<ImageView>(R.id.add_element)
         val elementEdit = findViewById<ImageView>(R.id.edit_element)
         val elementDelete = findViewById<ImageView>(R.id.delete_element)
-        elementAdd.setOnClickListener(::onAddElementClick)
+
+
+        elementAdd.setOnClickListener(::onAddMeetingClick)
         elementEdit.setOnClickListener(::onEditElementClick) //forcément un Meeting
         elementDelete.setOnClickListener(::onDeleteElementClick)
 
@@ -155,9 +161,13 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
         fragmentTransaction.commit()
     }
 
-    fun onAddElementClick(view: View) {
-        if(supportFragmentManager.findFragmentById(R.id.fragment_container) is MeetingListFragment) {
-            //si on est dans meetingList alors on affiche fragment création de meeting
+    override fun onPhaseFavoriteDelete() {
+        Toast.makeText(this, "Vous ne pouvez pas supprimer une phase favorite", Toast.LENGTH_SHORT).show()
+    }
+
+    fun onAddMeetingClick(View: View) {
+        //si on est dans meetingList alors on affiche fragment création de meeting
+        if(supportFragmentManager.findFragmentById(R.id.fragment_container) is MeetingListFragment){
             val fragment = EditMeetingFragment.newInstance()
             val fragmentManager: FragmentManager = this.supportFragmentManager
             val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
@@ -167,16 +177,60 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
             fragmentTransaction.replace(R.id.fragment_container, fragment)
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
-        } else if(supportFragmentManager.findFragmentById(R.id.fragment_container) is PhaseListFragment) {
-            val fragment = EditPhaseFragment.newInstance()
-            val fragmentManager: FragmentManager = supportFragmentManager
-            val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
 
-            fragment.setPhaseValues(PhaseViewModel(UUID.randomUUID(), "", "", 0L, "",false), null)
+        }else if(supportFragmentManager.findFragmentById(R.id.fragment_container) is PhaseListFragment){
+            val popupMenu = PopupMenu(this, elementAdd)
+            popupMenu.menu.add(Menu.NONE, 0, 0,"Ajouter une nouvelle phase")
+            val subMenu = popupMenu.menu.addSubMenu(Menu.NONE, 1, 1,"Ajouter une phase parmis les favoris")
 
-            fragmentTransaction.replace(R.id.fragment_container, fragment)
-            fragmentTransaction.addToBackStack(null)
-            fragmentTransaction.commit()
+            popupMenu.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    0 -> {
+                        val fragment = EditPhaseFragment.newInstance()
+                        val fragmentManager: FragmentManager = supportFragmentManager
+                        val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+
+                        fragment.setPhaseValues(PhaseViewModel(UUID.randomUUID(), "", "", 0L, "",false), null)
+
+                        fragmentTransaction.replace(R.id.fragment_container, fragment)
+                        fragmentTransaction.addToBackStack(null)
+                        fragmentTransaction.commit()
+                        true
+                    }
+                    1 -> {
+                        subMenu.clear()
+                        //TODO récupérer les phases favorites (c'est la que je pensais que la liste de phases favorites serait récupérer)
+                        phasesPresenter.getFavoritePhases(currentMeetingUUID)
+                        val favoritesPhases = ArrayList<PhaseViewModel>()
+                        // TODO supprimer test de remplissage
+                        subMenu.add(Menu.NONE, 0, 0, "test")
+                        subMenu.add(Menu.NONE, 1, 1, "test2")
+                        subMenu.add(Menu.NONE, 2, 2, "test3")
+
+                        // TODO remplir la liste de phases favorites
+                        for (i in 0 until favoritesPhases.size) {
+                            subMenu.add(Menu.NONE, i, i, favoritesPhases[i].name).setOnMenuItemClickListener { item ->
+                                val fragment = EditPhaseFragment.newInstance()
+                                val fragmentManager: FragmentManager = supportFragmentManager
+                                val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+
+                                //TODO pour images il faut tester si on peut les récupérer depuis la mainactivity ou autre part
+                                //val fav = favoritesPhases[item.subMenu?.item?.itemId!!] // valeur a passer au setPhaseValues
+                                // TODO ne pas utiliser setPhaseValues mais plutot onSelectedPhase de sorte a récupérer les images sauf qu'il faudrait cet méthode pour les favoris
+                                // étant donné que ce n'est pas la meme liste de phases que celle du presenter
+                                fragment.setPhaseValues(PhaseViewModel(UUID.randomUUID(),"phase favorite choisie","idem",20,"",true), null)
+
+                                fragmentTransaction.replace(R.id.fragment_container, fragment)
+                                fragmentTransaction.addToBackStack(null)
+                                fragmentTransaction.commit()
+                                true }
+                        }
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popupMenu.show()
         }
     }
 
@@ -206,13 +260,15 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
                 if(type == 0) {
                     phasesPresenter.removePhasesImages(currentMeetingUUID)
                     meetingPresenter.removeMeeting(currentMeetingUUID)
+                    onBackPressed()
                 } else {
-                    phasesPresenter.removePhase(currentPhaseUUID)
+                    if(phasesPresenter.isPhaseNotFavorite(currentPhaseUUID)) {
+                        phasesPresenter.removePhase(currentPhaseUUID)
+                    }else{
+                        Toast.makeText(this, "Vous ne pouvez pas supprimer une phase favorite", Toast.LENGTH_SHORT).show()
+                    }
                 }
-
                 onBackPressed()
-                onBackPressed()
-
             }
 
         snackbar.setActionTextColor(getColor(R.color.red))

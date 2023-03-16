@@ -44,8 +44,6 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
         phaseListViewModels.clear()
         phaseList.clear()
         GlobalScope.launch {
-
-
             myScoutRepository.getPhases(meetingId)?.take(1)?.collect { phases ->
                 for (i in 0 until phases?.size!!) {
                     phaseList.add(phases[i]!!)
@@ -140,10 +138,14 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
     }
 
     override fun removePhaseAt(index: Int) {
-        myScoutRepository.deletePhase(phaseList[index])
-        imageRepository.deletePhaseImages(phaseList[index])
-        phaseList.removeAt(index)
-        phaseListViewModels.removeAt(index)
+        if(!phaseList[index].favorite){
+            myScoutRepository.deletePhase(phaseList[index])
+            imageRepository.deletePhaseImages(phaseList[index])
+            phaseList.removeAt(index)
+            phaseListViewModels.removeAt(index)
+        }else{
+            selectsPhaseCallback?.onPhaseFavoriteDelete()
+        }
     }
 
     override fun movePhase(position: Int, toPosition: Int) {
@@ -187,6 +189,14 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
                 imageRepository.deletePhasesImages(phases)
             }
         }
+    }
+
+    override fun getFavoritePhases(meetingId: UUID){
+        // TODO : get favorite phases
+    }
+
+    override fun isPhaseNotFavorite(currentPhaseUUID: UUID): Boolean {
+        return phaseList.find { it.id == currentPhaseUUID }?.favorite == false
     }
 
     override fun setSelectPhaseCallback(iSelectPhaseCallback: ISelectPhaseCallback?) {
