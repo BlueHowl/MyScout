@@ -41,7 +41,6 @@ class ItemTouchHelperCallback(val adapter: IItemTouchHelperAdapter, val phasePre
         if(direction == ItemTouchHelper.LEFT) {
             val swipedItemPosition = viewHolder.adapterPosition
 
-            adapter.onItemRemove(swipedItemPosition)
             phasePresenter.removePhaseAt(swipedItemPosition)
         }
     }

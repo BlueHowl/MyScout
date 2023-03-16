@@ -195,16 +195,15 @@ class EditMeetingFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         }
     }
 
-    override fun setMeetingValues(meeting: MeetingViewModel?) {
+    override fun setMeetingValues(meeting: MeetingViewModel) {
         this.meeting = meeting
-        if(meeting != null) {
-            editMode = true
 
-            startDateHour = meeting.startDate
-            endDateHour = meeting.endDate
-            startLocation = meeting.startLocation
-            endLocation = meeting.endLocation
-        }
+        editMode = true
+
+        startDateHour = meeting.startDate
+        endDateHour = meeting.endDate
+        startLocation = meeting.startLocation
+        endLocation = meeting.endLocation
     }
 
     fun applyMeetingValues() {

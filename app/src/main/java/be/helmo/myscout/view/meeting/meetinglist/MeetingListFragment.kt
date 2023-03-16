@@ -40,7 +40,7 @@ class MeetingListFragment : Fragment(), IMeetingRecyclerCallback {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         Log.d(TAG, "onCreateView called")
-        val view: View = inflater.inflate(R.layout.fragment_meeting_list, container, false)
+        val view: View = inflater.inflate(R.layout.fragment_list, container, false)
 
         // Set the adapter
         if (view is RecyclerView) {

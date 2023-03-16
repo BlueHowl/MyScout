@@ -1,4 +1,4 @@
-package be.helmo.myscout.view.phases.phaselist
+package be.helmo.myscout.view.phases.favoritephaselist
 
 import android.content.Context
 import android.os.Bundle
@@ -7,32 +7,28 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import be.helmo.myscout.R
 import be.helmo.myscout.factory.PresenterSingletonFactory
-import be.helmo.myscout.factory.interfaces.IPhaseRecyclerCallback
-import be.helmo.myscout.presenters.interfaces.ISetMeetingInfos
-import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
-import be.helmo.myscout.view.interfaces.IPhaseRecyclerCallbackPresenter
+import be.helmo.myscout.factory.interfaces.IFavoritePhaseRecyclerCallback
+import be.helmo.myscout.view.interfaces.IFavoritePhaseRecyclerCallbackPresenter
 
 /**
  * A fragment representing a list of Items.
  */
-class PhaseListFragment : Fragment(), IPhaseRecyclerCallback, ISetMeetingInfos {
+class FavoritePhaseListFragment : Fragment(), IFavoritePhaseRecyclerCallback {
     var recyclerView: RecyclerView? = null
-    var recyclerAdapter: IItemTouchHelperAdapter? = null
 
-    lateinit var phasePresenter: IPhaseRecyclerCallbackPresenter
-
-    var meeting: MeetingViewModel? = null
+    lateinit var phasePresenter: IFavoritePhaseRecyclerCallbackPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        phasePresenter = PresenterSingletonFactory.instance!!.getPhaseRecyclerCallbackPresenter()
-        phasePresenter.setPhaseListCallback(this)
+        phasePresenter = PresenterSingletonFactory.instance!!.getFavoritePhaseRecyclerCallbackPresenter()
+        phasePresenter.setFavoritePhaseListCallback(this)
+
+        phasePresenter.getFavoritePhases()
 
         Log.d(TAG, "onCreate called")
     }
@@ -46,13 +42,8 @@ class PhaseListFragment : Fragment(), IPhaseRecyclerCallback, ISetMeetingInfos {
             val context = view.getContext()
             recyclerView = view
             recyclerView!!.layoutManager = LinearLayoutManager(context)
-            val adapter = PhaseListAdapter(phasePresenter)
-            recyclerAdapter = adapter
+            val adapter = FavoritePhaseListAdapter(phasePresenter, this)
             recyclerView!!.adapter = adapter
-
-            val itemTouchHelperCallback = ItemTouchHelperCallback(recyclerAdapter!!, phasePresenter)
-            val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
-            itemTouchHelper.attachToRecyclerView(recyclerView)
         }
 
         return view
@@ -64,15 +55,15 @@ class PhaseListFragment : Fragment(), IPhaseRecyclerCallback, ISetMeetingInfos {
 
         //change le titre du menu
         val menuTitle = requireActivity().findViewById<TextView>(R.id.menu_title)
-        menuTitle.text = getString(R.string.app_name_phases)
+        menuTitle.text = getString(R.string.app_name_favorite_phases)
 
         //rend le btn add element visible
         val addElement = requireActivity().findViewById<ImageView>(R.id.add_element)
-        addElement.visibility = View.VISIBLE
+        addElement.visibility = View.GONE
 
         //rend le btn edit_element visible
         val editElement = requireActivity().findViewById<ImageView>(R.id.edit_element)
-        editElement.visibility = View.VISIBLE
+        editElement.visibility = View.GONE
 
         //rend le btn delete_element invisible
         val deleteElement = requireActivity().findViewById<ImageView>(R.id.delete_element)
@@ -92,26 +83,20 @@ class PhaseListFragment : Fragment(), IPhaseRecyclerCallback, ISetMeetingInfos {
         //callback = null
     }
 
-    override fun onPhaseDataChanged(phaseIndex: Int) {
+    override fun onFavoritePhaseAdd(phaseIndex: Int) {
         requireActivity().runOnUiThread {
             recyclerView?.adapter?.notifyItemChanged(phaseIndex)
         }
     }
 
-    override fun onPhaseRemoved(phaseIndex: Int) {
-        requireActivity().runOnUiThread {
-            recyclerView?.adapter?.notifyItemRemoved(phaseIndex)
-        }
-    }
-
-    override fun setMeetingValues(meeting: MeetingViewModel) {
-        this.meeting = meeting
+    fun onFavoritePhaseSelected() {
+        activity?.onBackPressed() //todo changer?
     }
 
     companion object {
         private const val TAG = "PhaseListFragment"
-        fun newInstance(): PhaseListFragment {
-            return PhaseListFragment()
+        fun newInstance(): FavoritePhaseListFragment {
+            return FavoritePhaseListFragment()
         }
     }
 }

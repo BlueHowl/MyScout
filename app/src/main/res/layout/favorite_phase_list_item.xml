@@ -11,29 +11,34 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
+        android:layout_weight="1"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="8dp"
+            android:layout_weight="0"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/t_phase_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="3"
+                android:layout_weight="1"
                 android:text=""
                 android:textSize="20sp" />
 
-            <TextView
-                android:id="@+id/t_phase_startTime"
+            <RatingBar
+                android:id="@+id/favorite2"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="end"
-                android:text="" />
+                android:layout_height="50dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="24dp"
+                android:contentDescription="@string/favorite"
+                android:max="1"
+                android:numStars="1"
+                android:stepSize="1" />
 
         </LinearLayout>
 
@@ -42,21 +47,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            android:layout_weight="1"
             android:maxHeight="80dp"
             android:text=""
             android:textSize="16sp" />
 
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/delete_icon2"
-        android:layout_width="30dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_vertical|end"
-        android:alpha="0"
-        android:contentDescription="@string/delete"
-        android:src="@drawable/ic_delete_item"
-        android:visibility="gone" />
 
 
 </LinearLayout>

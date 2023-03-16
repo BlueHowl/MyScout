@@ -13,7 +13,7 @@ import be.helmo.myscout.view.interfaces.IPhaseRecyclerCallbackPresenter
 
 class PhaseListAdapter(phaseListPresenter: IPhaseRecyclerCallbackPresenter) : RecyclerView.Adapter<PhaseListAdapter.PhaseViewHolder>(),
     IItemTouchHelperAdapter {
-    private var presenter: IPhaseRecyclerCallbackPresenter? = phaseListPresenter
+    var presenter: IPhaseRecyclerCallbackPresenter? = phaseListPresenter
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhaseViewHolder {
         return PhaseViewHolder(
@@ -42,10 +42,6 @@ class PhaseListAdapter(phaseListPresenter: IPhaseRecyclerCallbackPresenter) : Re
 
     override fun onItemDragEnd(fromPosition: Int, toPosition: Int) {
         presenter!!.movePhase(fromPosition, toPosition)
-    }
-
-    override fun onItemRemove(position: Int) {
-        notifyItemRemoved(position)
     }
 
     inner class PhaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
@@ -89,7 +85,6 @@ interface IItemTouchHelperAdapter {
 
     fun onItemDragEnd(fromPosition: Int, toPosition: Int)
 
-    fun onItemRemove(position: Int)
 }
 
 interface IItemTouchHelperViewHolder {

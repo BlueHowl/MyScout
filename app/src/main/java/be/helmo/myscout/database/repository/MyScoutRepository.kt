@@ -52,6 +52,9 @@ class MyScoutRepository(var imageRepository: IImageRepository) {//private constr
         return phaseDao?.getPhases(meetingUUID)
     }
 
+    val favoritePhases: Flow<List<Phase?>?>?
+        get() = phaseDao?.favoritePhases
+
     fun getPhase(phaseUUID: UUID?): Flow<Phase?>? {
         return phaseDao?.getPhase(phaseUUID)
     }

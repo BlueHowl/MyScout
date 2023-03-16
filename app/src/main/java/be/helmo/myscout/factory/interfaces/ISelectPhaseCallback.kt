@@ -6,6 +6,6 @@ import be.helmo.myscout.presenters.viewmodel.PhaseViewModel
 
 interface ISelectPhaseCallback {
 
-    fun onSelectedPhase(phase: PhaseViewModel, images: ArrayList<Uri>)
+    fun onSelectedPhase(phase: PhaseViewModel, images: ArrayList<Uri>?)
 
 }

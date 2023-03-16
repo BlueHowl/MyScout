@@ -25,8 +25,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class MeetingPresenter(var myScoutRepository: MyScoutRepository
-) : IMeetingRecyclerCallbackPresenter, IMeetingsSelectMeetingCallback, IMeetingPresenter, LifecycleService() {
+class MeetingPresenter(var myScoutRepository: MyScoutRepository) : IMeetingPresenter {
     var meetingList: ArrayList<Meeting> = ArrayList<Meeting>() //liste meetings
     var meetingListViewModels: ArrayList<MeetingListViewModel> = ArrayList<MeetingListViewModel>() //list meetings ViewModels
 

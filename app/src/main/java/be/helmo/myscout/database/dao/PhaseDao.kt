@@ -1,6 +1,7 @@
 package be.helmo.myscout.database.dao
 
 import androidx.room.*
+import be.helmo.myscout.model.Meeting
 import be.helmo.myscout.model.MeetingPhaseJoin
 import be.helmo.myscout.model.Phase
 import kotlinx.coroutines.flow.Flow
@@ -15,6 +16,10 @@ interface PhaseDao {
             "WHERE M.id = (:uuid) ORDER BY P.num")
     fun getPhases(uuid: UUID?): Flow<List<Phase?>?>?
 
+    @get:Query("SELECT id, num, name, description, duration, notice, favorite FROM " +
+                "Phase WHERE favorite = 1")
+    val favoritePhases: Flow<List<Phase?>?>?
+
     @Query("SELECT id, num, name, description, duration, notice, favorite FROM Phase " +
             "WHERE id = (:uuid)")
     fun getPhase(uuid: UUID?): Flow<Phase?>?
@@ -24,9 +29,6 @@ interface PhaseDao {
 
     @Update
     fun update(phase: Phase?)
-
-    // how to specify an other table than the one in the entity ?
-
 
     @Query("DELETE FROM MeetingPhaseJoin WHERE phaseId = (:uuid)")
     fun delete(uuid: UUID?)

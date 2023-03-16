@@ -38,7 +38,11 @@ class PresenterSingletonFactory() {
         return phasePresenter
     }
 
-    fun getRecyclerCallbackPhasePresenter(): IPhaseRecyclerCallbackPresenter {
+    fun getPhaseRecyclerCallbackPresenter(): IPhaseRecyclerCallbackPresenter {
+        return phasePresenter
+    }
+
+    fun getFavoritePhaseRecyclerCallbackPresenter(): IFavoritePhaseRecyclerCallbackPresenter {
         return phasePresenter
     }
 

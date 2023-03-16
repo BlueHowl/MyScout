@@ -154,6 +154,7 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
                         resumeText.text.toString(),
                         favorite.rating >= 1F
                     )
+
                 }
                 activity?.onBackPressed() //todo changer?
             }
