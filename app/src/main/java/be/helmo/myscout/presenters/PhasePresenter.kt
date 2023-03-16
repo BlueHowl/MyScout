@@ -3,6 +3,8 @@ package be.helmo.myscout.presenters
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
+import be.helmo.myscout.MainActivity
 import be.helmo.myscout.database.repository.MyScoutRepository
 import be.helmo.myscout.factory.interfaces.IPhaseRecyclerCallback
 import be.helmo.myscout.factory.interfaces.ISelectPhaseCallback
@@ -144,7 +146,7 @@ class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageReposito
             phaseList.removeAt(index)
             phaseListViewModels.removeAt(index)
         }else{
-            selectsPhaseCallback?.onPhaseFavoriteDelete()
+            Toast.makeText(MainActivity.appContext, "Vous ne pouvez pas supprimer une phase favorite", Toast.LENGTH_SHORT).show()
         }
     }
 

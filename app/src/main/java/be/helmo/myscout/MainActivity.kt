@@ -161,10 +161,6 @@ class MainActivity : AppCompatActivity(), ISelectMeetingCallback, ISelectPhaseCa
         fragmentTransaction.commit()
     }
 
-    override fun onPhaseFavoriteDelete() {
-        Toast.makeText(this, "Vous ne pouvez pas supprimer une phase favorite", Toast.LENGTH_SHORT).show()
-    }
-
     fun onAddMeetingClick(View: View) {
         //si on est dans meetingList alors on affiche fragment création de meeting
         if(supportFragmentManager.findFragmentById(R.id.fragment_container) is MeetingListFragment){

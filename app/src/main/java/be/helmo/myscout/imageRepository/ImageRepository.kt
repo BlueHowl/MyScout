@@ -21,10 +21,7 @@ class ImageRepository : IImageRepository{
 
     override fun createDirectoryAndSaveImage(imageToSave: Bitmap, directoryName: String) : Uri {
         val directory = File(MainActivity.appContext.getExternalFilesDir(null), String.format("%s%s", "/images/", directoryName))
-        Log.d("ImageRepository", "createDirectoryAndSaveImage: directoryName: $directoryName")
-        Log.d("ImageRepository", "createDirectoryAndSaveImage: directory: ${directory.path}")
         if (!directory.exists()) {
-            Log.d("ImageRepository", "createDirectoryAndSaveImage: directory created")
             directory.mkdirs()
         }
 
