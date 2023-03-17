@@ -9,7 +9,7 @@ import java.util.*
 @Entity
 data class Phase (
     @PrimaryKey
-    val id: UUID,
+    var id: UUID,
 
     var num: Int,
 

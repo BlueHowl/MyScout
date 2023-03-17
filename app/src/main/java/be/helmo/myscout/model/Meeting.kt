@@ -11,7 +11,7 @@ import java.util.*
 data class Meeting (
     @PrimaryKey
     @ColumnInfo(name = "id")
-    val id: UUID,
+    var id: UUID,
 
     @ColumnInfo(name = "description")
     var description: String?,
