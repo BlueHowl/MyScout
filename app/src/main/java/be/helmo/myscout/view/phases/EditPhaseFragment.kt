@@ -2,22 +2,26 @@ package be.helmo.myscout.view.phases
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter.AuthorityEntry
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.Matrix
+import android.graphics.drawable.ColorDrawable
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.provider.MediaStore.Images.*
 import android.util.Log
 import android.view.*
 import android.view.View.OnTouchListener
 import android.widget.*
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import be.helmo.myscout.BuildConfig
 import be.helmo.myscout.R
@@ -27,8 +31,8 @@ import be.helmo.myscout.presenters.viewmodel.PhaseViewModel
 import be.helmo.myscout.view.interfaces.IPhasePresenter
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
-import java.security.AuthProvider
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -194,17 +198,34 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
                         phasePresenter.deleteImage(images?.get(position))
                         images?.removeAt(position)
                         if (images?.size!! > 0) {
-                            if (position == images?.size!! && position > 0) {
-                                position--
-                            }
+                            previousImage()
                             imageSwitcher.setImageURI(images?.get(position))
                         } else {
-                            imageSwitcher.setImageURI(null)
+                            imageSwitcher.setImageURI(Uri.EMPTY)
                         }
                     }
                     builder.setNegativeButton("Non") { _, _ -> }
                     builder.show()
                 }
+            }
+
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                val dialog = Dialog(context!!)
+                dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                val imageView = ImageView(context)
+                imageView.setImageURI(getImageUri(context!!, rotateImageIfRequired(images?.get(position))))
+                dialog.addContentView(
+                    imageView, RelativeLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+                )
+                if(dialog.isShowing){
+                    dialog.dismiss()
+                }else{
+                    dialog.show()
+                }
+                return true
             }
         })
 
@@ -214,14 +235,6 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
         applyPhaseValues()
 
         return view
-    }
-
-    @Throws(IOException::class)
-    fun createImageFile(): File {
-        val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), String.format("%d.jpeg", path.listFiles()?.size))
-
-        return file
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -280,50 +293,48 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
                 if(data!!.clipData != null){
                     val count = data.clipData!!.itemCount
                     for(i in 0 until count){
-                        val imageUri = compressUri(context,data.clipData!!.getItemAt(i).uri)
-                        images?.add(imageUri)
+                        images?.add(compressUri(requireContext(),data.clipData!!.getItemAt(i).uri))
                     }
-                    imageSwitcher.setImageURI(images?.get(0))
-                    position = 0
+                    position = images?.size!! - 1
+                    imageSwitcher.setImageURI(images?.get(position))
                 } else if(data.data != null){
-                    val imageUri = compressUri(context,data.data!!)
-                    images?.add(imageUri)
-                    imageSwitcher.setImageURI(images?.get(0))
-                    position = 0
+                    images?.add(compressUri(requireContext(),data.data!!))
+                    position = images?.size!! - 1
+                    imageSwitcher.setImageURI(images?.get(position))
                 }
+                data.data = null
+                data.clipData = null
             }
         }else if(requestCode == cameraPhotoCode){
             if(resultCode == Activity.RESULT_OK){
                 if(photoFile != null){
                     photoFile?.let {
-                        val imageBitmap = rotateImageIfRequired(Uri.fromFile(it))
+                        val imageBitmap = rotateImageIfRequired(it.toUri())
                         val imageUri = getImageUri(requireContext(),imageBitmap)
                         images?.add(compressUri(requireContext(),imageUri))
-                        imageSwitcher.setImageURI(images?.get(0))
-                        position = 0
+                        position = images?.size!! - 1
+                        imageSwitcher.setImageURI(images?.get(position))
                     }
                 }
             }
         }
     }
 
-    private fun getImageUri(inContext: Context, inImage: Bitmap): Uri? {
+    fun getImageUri(inContext: Context, inImage: Bitmap): Uri? {
         val bytes = ByteArrayOutputStream()
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-        val path =
-            MediaStore.Images.Media.insertImage(inContext.contentResolver, inImage, "Title", null)
+        val path = MediaStore.Images.Media.insertImage(inContext.contentResolver, inImage, "Title", null)
         return Uri.parse(path)
     }
 
-    private fun pickImagesIntent() {
-        val intent = Intent()
+    fun pickImagesIntent() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-        intent.action = Intent.ACTION_GET_CONTENT
-        startActivityForResult(Intent.createChooser(intent, "Choisir photo"), pickImageCode)
+        startActivityForResult(intent, pickImageCode)
     }
 
-    private fun dispatchTakePictureIntent() {
+    fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Ensure that there's a camera activity to handle the intent
             takePictureIntent.resolveActivity(requireActivity().packageManager)?.also {
@@ -375,17 +386,18 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
 
     // fonctions pour les images
     @Throws(IOException::class)
-    private fun rotateImageIfRequired(selectedImage: Uri): Bitmap {
+    private fun rotateImageIfRequired(selectedImage: Uri?): Bitmap {
         //get the path of the image from the context
-        val ei = ExifInterface(selectedImage.path!!)
+        val ei = ExifInterface(selectedImage?.path!!)
         val orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
         val imageBitmap = selectedImage.path?.let { BitmapFactory.decodeFile(it) }
-        return when (orientation) {
+        val bitmap = when (orientation) {
             ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(imageBitmap, 90F)
             ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(imageBitmap, 180F)
             ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(imageBitmap, 270F)
             else -> imageBitmap!!
         }
+        return bitmap
     }
 
     fun rotateImage(source: Bitmap?, angle: Float): Bitmap {
@@ -410,14 +422,6 @@ class EditPhaseFragment : Fragment(), IEditPhaseFragment {
         o2.inSampleSize = 2
         return getImageUri(BitmapFactory.decodeStream(c?.contentResolver?.openInputStream(uri!!), null, o2), true)
 
-    }
-
-    fun compressUri(uri: Bitmap?): Uri {
-        val o = BitmapFactory.Options()
-        o.inJustDecodeBounds = true
-        val o2 = BitmapFactory.Options()
-        o2.inSampleSize = 2
-        return getImageUri(uri!!, true)
     }
 
     companion object {

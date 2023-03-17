@@ -60,21 +60,20 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <ImageSwitcher
             android:id="@+id/phase_image_switcher"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
             android:gravity="center"
-            android:minHeight="200dp"
             android:scaleType="fitXY" />
 
         <LinearLayout
             android:id="@+id/phase_image_switcher_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/phase_image_switcher"
+            android:layout_above="@id/phase_pick_photos_btn"
             android:layout_gravity="bottom"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="12dp"
@@ -85,7 +84,6 @@
                 android:id="@+id/phase_previous_photo_btn"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_below="@id/phase_image_switcher"
                 android:layout_marginEnd="12dp"
                 android:layout_weight="1"
                 android:text="@string/phase_previous_photo" />
@@ -94,8 +92,6 @@
                 android:id="@+id/phase_next_photo_btn"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_below="@id/phase_image_switcher"
-                android:layout_alignParentEnd="true"
                 android:layout_weight="1"
                 android:text="@string/phase_next_photo" />
 
@@ -105,12 +101,13 @@
             android:id="@+id/phase_pick_photos_btn"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:layout_below="@id/phase_image_switcher_buttons"
+            android:layout_above="@id/phase_buttons"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="12dp"
             android:text="@string/phase_pick_photos" />
 
         <LinearLayout
+            android:id="@+id/phase_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
