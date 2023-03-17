@@ -15,6 +15,7 @@ import be.helmo.myscout.presenters.viewmodel.FavoritePhaseListViewModel
 import be.helmo.myscout.presenters.viewmodel.PhaseListViewModel
 import be.helmo.myscout.presenters.viewmodel.PhaseViewModel
 import be.helmo.myscout.repositories.IImageRepository
+import be.helmo.myscout.repositories.IMyScoutRepository
 import be.helmo.myscout.view.interfaces.IPhasePresenter
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.*
@@ -25,7 +26,7 @@ import kotlin.collections.ArrayList
 import kotlin.math.max
 import kotlin.math.min
 
-class PhasePresenter(var myScoutRepository: MyScoutRepository, var imageRepository: IImageRepository) : IPhasePresenter {
+class PhasePresenter(var myScoutRepository: IMyScoutRepository, var imageRepository: IImageRepository) : IPhasePresenter {
     var phaseList: ArrayList<Phase> = ArrayList() //liste phase
     var phaseListViewModels: ArrayList<PhaseListViewModel> = ArrayList() //list phase ViewModels
 

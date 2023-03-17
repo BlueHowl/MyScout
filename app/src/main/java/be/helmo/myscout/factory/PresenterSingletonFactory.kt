@@ -5,12 +5,13 @@ import be.helmo.myscout.imageRepository.ImageRepository
 import be.helmo.myscout.presenters.MeetingPresenter
 import be.helmo.myscout.presenters.PhasePresenter
 import be.helmo.myscout.repositories.IImageRepository
+import be.helmo.myscout.repositories.IMyScoutRepository
 import be.helmo.myscout.view.interfaces.*
 
 class PresenterSingletonFactory() {
 
     val imageRepository: IImageRepository = ImageRepository()
-    val myScoutRepository: MyScoutRepository = MyScoutRepository(imageRepository)
+    val myScoutRepository: IMyScoutRepository = MyScoutRepository(imageRepository)
 
 
     val meetingPresenter: MeetingPresenter = MeetingPresenter(myScoutRepository)

@@ -7,6 +7,7 @@ import be.helmo.myscout.model.Meeting
 import be.helmo.myscout.model.MeetingPhaseJoin
 import be.helmo.myscout.model.Phase
 import be.helmo.myscout.repositories.IImageRepository
+import be.helmo.myscout.repositories.IMyScoutRepository
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -15,26 +16,26 @@ import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.Executors
 
-class MyScoutRepository(var imageRepository: IImageRepository) {//private constructor() {
+class MyScoutRepository(var imageRepository: IImageRepository) : IMyScoutRepository {//private constructor() {
     val meetingDao = MyScoutDatabase.getInstance()?.meetingDao()
     val phaseDao = MyScoutDatabase.getInstance()?.phaseDao()
 
     val executor = Executors.newSingleThreadExecutor()
 
     //Meeting
-    val meetings: Flow<List<Meeting?>?>?
+    override val meetings: Flow<List<Meeting?>?>?
         get() = meetingDao?.meetings
 
-    fun insertMeeting(meeting: Meeting?) {
+    override fun insertMeeting(meeting: Meeting?) {
         Log.d("meetingDao", meetingDao?.meetings.toString()) //null wtf
         executor.execute { meetingDao?.insert(meeting) }
     }
 
-    fun updateMeeting(meeting: Meeting?) {
+    override fun updateMeeting(meeting: Meeting?) {
         executor.execute { meetingDao?.update(meeting) }
     }
 
-    fun deleteMeeting(meeting: Meeting?) {
+    override fun deleteMeeting(meeting: Meeting?) {
         GlobalScope.launch {
             phaseDao?.getPhases(meeting?.id)?.take(1)?.collect{ phases ->
                 for (i in 0 until phases?.size!!) {
@@ -48,30 +49,30 @@ class MyScoutRepository(var imageRepository: IImageRepository) {//private constr
     }
 
     //Phase
-    fun getPhases(meetingUUID: UUID?): Flow<List<Phase?>?>? {
+    override fun getPhases(meetingUUID: UUID?): Flow<List<Phase?>?>? {
         return phaseDao?.getPhases(meetingUUID)
     }
 
-    val favoritePhases: Flow<List<Phase?>?>?
+    override val favoritePhases: Flow<List<Phase?>?>?
         get() = phaseDao?.favoritePhases
 
-    fun getPhase(phaseUUID: UUID?): Flow<Phase?>? {
+    override fun getPhase(phaseUUID: UUID?): Flow<Phase?>? {
         return phaseDao?.getPhase(phaseUUID)
     }
 
-    fun insertPhase(phase: Phase?) {
+    override fun insertPhase(phase: Phase?) {
         executor.execute { phaseDao?.insert(phase) }
     }
 
-    fun updatePhase(phase: Phase?) {
+    override fun updatePhase(phase: Phase?) {
         executor.execute { phaseDao?.update(phase) }
     }
 
-    fun deletePhase(phase: Phase?) {
+    override fun deletePhase(phase: Phase?) {
         executor.execute { phaseDao?.delete(phase?.id) }
     }
 
-    fun insertMeetingPhaseJoin(meetingPhaseJoin: MeetingPhaseJoin) {
+    override fun insertMeetingPhaseJoin(meetingPhaseJoin: MeetingPhaseJoin) {
         executor.execute { phaseDao?.insert(meetingPhaseJoin) }
     }
 }

@@ -12,6 +12,7 @@ import be.helmo.myscout.presenters.interfaces.IMeetingRowView
 import be.helmo.myscout.presenters.viewmodel.MeetingListViewModel
 import be.helmo.myscout.presenters.viewmodel.MeetingViewModel
 import be.helmo.myscout.repositories.IImageRepository
+import be.helmo.myscout.repositories.IMyScoutRepository
 import be.helmo.myscout.view.interfaces.IMeetingPresenter
 import be.helmo.myscout.view.interfaces.IMeetingRecyclerCallbackPresenter
 import be.helmo.myscout.view.interfaces.IMeetingsSelectMeetingCallback
@@ -25,7 +26,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class MeetingPresenter(var myScoutRepository: MyScoutRepository) : IMeetingPresenter {
+class MeetingPresenter(var myScoutRepository: IMyScoutRepository) : IMeetingPresenter {
     var meetingList: ArrayList<Meeting> = ArrayList<Meeting>() //liste meetings
     var meetingListViewModels: ArrayList<MeetingListViewModel> = ArrayList<MeetingListViewModel>() //list meetings ViewModels
 
