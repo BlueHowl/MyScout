@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="16dp"
+    android:orientation="vertical"
+    tools:context=".view.phases.EditPhaseFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/et_phase_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="@string/phase_name_edit_title"
+            android:inputType="textPersonName"
+            android:textSize="24sp" />
+
+        <RatingBar
+            android:id="@+id/favorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="24dp"
+            android:contentDescription="@string/favorite"
+            android:max="1"
+            android:numStars="1"
+            android:stepSize="1" />
+    </LinearLayout>
+
+
+    <EditText
+        android:id="@+id/phase_duration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/phase_during_edit_title"
+        android:inputType="number"
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/phase_resume"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/phase_resume_edit_title"
+        android:textSize="24sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/phase_adding_photo_title" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageSwitcher
+            android:id="@+id/phase_image_switcher"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:gravity="center"
+            android:scaleType="fitXY" />
+
+        <LinearLayout
+            android:id="@+id/phase_image_switcher_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/phase_pick_photos_btn"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/phase_previous_photo_btn"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
+                android:text="@string/phase_previous_photo" />
+
+            <Button
+                android:id="@+id/phase_next_photo_btn"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:text="@string/phase_next_photo" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/phase_pick_photos_btn"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_above="@id/phase_buttons"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:text="@string/phase_pick_photos" />
+
+        <LinearLayout
+            android:id="@+id/phase_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/phase_abort_btn"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
+                android:text="@string/phase_abort" />
+
+            <Button
+                android:id="@+id/phase_validate_btn"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:text="@string/phase_validate" />
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+
+</LinearLayout>
