@@ -159,7 +159,7 @@ class MeetingPresenter(var myScoutRepository: IMyScoutRepository) : IMeetingPres
 
 
         //clé api différente acceptant uniquement geocoding
-        val url = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%s,%s&key=%s", location.latitude, location.longitude, "AIzaSyC1u56ll03xLq-7EqyRjDULFy0u-KVdcOA")
+        val url = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%s,%s&key=%s", location.latitude, location.longitude, "API_KEY")
         val response = URL(url).readText()
         val jsonObject = JSONObject(response)
         val results = jsonObject.getJSONArray("results")
